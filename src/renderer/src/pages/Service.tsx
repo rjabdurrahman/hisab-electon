@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
 import BasicTable from '../components/table/BasicTable';
 import { ITableColumn } from '../components/table/ITable';
 import FormInput from '../components/form/FormInput';
@@ -23,14 +24,31 @@ const Service = () => {
 
   const [selectedService, setSelectedService] = useState<ServiceData | null>(null);
 
-  const { openModal: openAdd, Modal: AddModal } = usePopup("large");
-  const { openModal: openEdit, Modal: EditModal } = usePopup("large");
-  const { openModal: openDelete, Modal: DeleteModal } = usePopup("medium");
+  // Forms
+  const addMethods = useForm<ServiceData>();
+  const editMethods = useForm<ServiceData>();
+
+  const { openModal: openAdd, Modal: AddModal, closeModal: closeAdd } = usePopup("large");
+  const { openModal: openEdit, Modal: EditModal, closeModal: closeEdit } = usePopup("large");
+  const { openModal: openDelete, Modal: DeleteModal, closeModal: closeDelete } = usePopup("medium");
+
+  const onAddSubmit = (data: ServiceData) => {
+    const newIdx = services.length + 1;
+    setServices([...services, { ...data, id: newIdx, price: Number(data.price) }]);
+    addMethods.reset();
+    closeAdd();
+  };
+
+  const onEditSubmit = (data: ServiceData) => {
+    setServices(services.map(s => s.id === selectedService?.id ? { ...s, ...data, price: Number(data.price) } : s));
+    closeEdit();
+  };
 
   const handleDelete = () => {
     if (selectedService) {
       setServices(services.filter(s => s.id !== selectedService.id));
       setSelectedService(null);
+      closeDelete();
     }
   };
 
@@ -41,7 +59,7 @@ const Service = () => {
     { key: 'duration', label: 'Duration' },
     { 
       key: 'price', label: 'Service Fee', render: (val) => (
-        <span className="font-bold text-[#2CAFFE]">৳{val.toLocaleString()}</span>
+        <span className="font-bold text-[#2CAFFE]">৳{Number(val).toLocaleString()}</span>
       )
     },
     {
@@ -50,7 +68,7 @@ const Service = () => {
           <Button
             variant="icon"
             size="extraSmall"
-            onClick={() => { setSelectedService(row); openEdit(); }}
+            onClick={() => { setSelectedService(row); editMethods.reset(row); openEdit(); }}
             textColor="#333333"
           >
             ✏️
@@ -89,33 +107,35 @@ const Service = () => {
       </div>
 
       <AddModal title="Register New Service Offering">
-        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); }}>
-          <FormInput name="name" label="Service Name" placeholder="e.g. Blood Test" />
-          <div className="grid grid-cols-2 gap-4">
-            <FormInput name="category" label="Category" placeholder="e.g. Diagnostic" />
-            <FormInput name="duration" label="Estimated Duration" placeholder="e.g. 15 mins" />
-          </div>
-          <FormInput name="price" label="Service Fee (৳)" type="number" placeholder="500" />
-          <div className="pt-4 flex justify-end gap-2">
-            <Button bgColor="#333333" className="w-full rounded-lg py-4 shadow-xl">Define New Service</Button>
-          </div>
-        </form>
+        <FormProvider {...addMethods}>
+          <form className="space-y-4" onSubmit={addMethods.handleSubmit(onAddSubmit)}>
+            <FormInput name="name" label="Service Name" placeholder="e.g. Blood Test" required="Service name required" />
+            <div className="grid grid-cols-2 gap-4">
+              <FormInput name="category" label="Category" placeholder="e.g. Diagnostic" required="Category required" />
+              <FormInput name="duration" label="Estimated Duration" placeholder="e.g. 15 mins" />
+            </div>
+            <FormInput name="price" label="Service Fee (৳)" type="number" placeholder="500" required="Price required" />
+            <div className="pt-4 flex justify-end gap-2">
+              <Button type="submit" bgColor="#333333" className="w-full rounded-lg py-4 shadow-xl">Define New Service</Button>
+            </div>
+          </form>
+        </FormProvider>
       </AddModal>
 
       <EditModal title="Modify Service Configuration">
-        {selectedService && (
-          <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); }}>
-            <FormInput name="name" label="Service Name" defaultValue={selectedService.name} />
+        <FormProvider {...editMethods}>
+          <form className="space-y-4" onSubmit={editMethods.handleSubmit(onEditSubmit)}>
+            <FormInput name="name" label="Service Name" />
             <div className="grid grid-cols-2 gap-4">
-              <FormInput name="category" label="Category" defaultValue={selectedService.category} />
-              <FormInput name="duration" label="Estimated Duration" defaultValue={selectedService.duration} />
+              <FormInput name="category" label="Category" />
+              <FormInput name="duration" label="Estimated Duration" />
             </div>
-            <FormInput name="price" label="Service Fee (৳)" type="number" defaultValue={selectedService.price.toString()} />
+            <FormInput name="price" label="Service Fee (৳)" type="number" />
             <div className="pt-4 flex justify-end gap-2">
-              <Button bgColor="#333333" className="w-full rounded-lg py-4 shadow-xl text-white">Update Service Details</Button>
+              <Button type="submit" bgColor="#333333" className="w-full rounded-lg py-4 shadow-xl text-white">Update Service Details</Button>
             </div>
           </form>
-        )}
+        </FormProvider>
       </EditModal>
 
       <DeleteModal title="Remove Service offering">

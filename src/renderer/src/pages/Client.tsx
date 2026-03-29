@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
 import BasicTable from '../components/table/BasicTable';
 import { ITableColumn } from '../components/table/ITable';
 import FormInput from '../components/form/FormInput';
+import FormSelect from '../components/form/FormSelect';
 import Button from '../components/buttons/Button';
 import usePopup from '../hooks/usePopup';
 import Delete from '../components/Delete';
@@ -25,14 +27,31 @@ const Client = () => {
 
   const [selectedClient, setSelectedClient] = useState<ClientData | null>(null);
 
-  const { openModal: openAdd, Modal: AddModal } = usePopup("large");
-  const { openModal: openEdit, Modal: EditModal } = usePopup("large");
-  const { openModal: openDelete, Modal: DeleteModal } = usePopup("medium");
+  // Forms
+  const addMethods = useForm<ClientData>();
+  const editMethods = useForm<ClientData>();
+
+  const { openModal: openAdd, Modal: AddAddModal, closeModal: closeAdd } = usePopup("large");
+  const { openModal: openEdit, Modal: EditEditModal, closeModal: closeEdit } = usePopup("large");
+  const { openModal: openDelete, Modal: DeleteModal, closeModal: closeDelete } = usePopup("medium");
+
+  const onAddSubmit = (data: ClientData) => {
+    const newIdx = clients.length + 1;
+    setClients([...clients, { ...data, id: newIdx, registeredAt: new Date().toISOString().split('T')[0] }]);
+    addMethods.reset();
+    closeAdd();
+  };
+
+  const onEditSubmit = (data: ClientData) => {
+    setClients(clients.map(c => c.id === selectedClient?.id ? { ...c, ...data } : c));
+    closeEdit();
+  };
 
   const handleDelete = () => {
     if (selectedClient) {
       setClients(clients.filter(c => c.id !== selectedClient.id));
       setSelectedClient(null);
+      closeDelete();
     }
   };
 
@@ -49,7 +68,7 @@ const Client = () => {
           <Button
             variant="icon"
             size="extraSmall"
-            onClick={() => { setSelectedClient(row); openEdit(); }}
+            onClick={() => { setSelectedClient(row); editMethods.reset(row); openEdit(); }}
             textColor="#333333"
           >
             ✏️
@@ -87,55 +106,59 @@ const Client = () => {
         <BasicTable columns={columns} data={clients} />
       </div>
 
-      <AddModal title="Register New Client">
-        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); }}>
-          <div className="grid grid-cols-2 gap-4">
-            <FormInput name="name" label="Full Name" placeholder="e.g. John Doe" />
-            <FormInput name="phone" label="Phone Number" placeholder="e.g. 01700000000" />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <FormInput name="email" label="Email Address" type="email" placeholder="john@example.com" />
-            <div className="space-y-1">
-              <label className="block text-[#475569] mb-1 pl-1 font-bold text-[12px] uppercase tracking-wider">Gender</label>
-              <select className="w-full px-3 py-2 rounded bg-[#F4F4F4F2] border border-gray-300 focus:border-pos-blue focus:ring-4 focus:ring-pos-blue/10 outline-none transition-all font-bold text-[13px] appearance-none">
-                <option>Male</option>
-                <option>Female</option>
-                <option>Other</option>
-              </select>
-            </div>
-          </div>
-          <FormInput name="address" label="Home Address" placeholder="City, Area, Road" />
-          <div className="pt-4 flex justify-end gap-2">
-            <Button bgColor="#333333" className="w-full rounded-lg py-4 shadow-xl">Confirm Client Registration</Button>
-          </div>
-        </form>
-      </AddModal>
-
-      <EditModal title="Edit Client Details">
-        {selectedClient && (
-          <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); }}>
+      <AddAddModal title="Register New Client">
+        <FormProvider {...addMethods}>
+          <form className="space-y-4" onSubmit={addMethods.handleSubmit(onAddSubmit)}>
             <div className="grid grid-cols-2 gap-4">
-              <FormInput name="name" label="Full Name" defaultValue={selectedClient.name} />
-              <FormInput name="phone" label="Phone Number" defaultValue={selectedClient.phone} />
+              <FormInput name="name" label="Full Name" placeholder="e.g. John Doe" required="Name is required" />
+              <FormInput name="phone" label="Phone Number" placeholder="e.g. 01700000000" required="Phone is required" />
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <FormInput name="email" label="Email Address" type="email" defaultValue={selectedClient.email} />
-              <div className="space-y-1">
-                <label className="block text-[#475569] mb-1 pl-1 font-bold text-[12px] uppercase tracking-wider">Gender</label>
-                <select defaultValue={selectedClient.gender} className="w-full px-3 py-2 rounded bg-[#F4F4F4F2] border border-gray-300 focus:border-pos-blue focus:ring-4 focus:ring-pos-blue/10 outline-none transition-all font-bold text-[13px] appearance-none">
-                  <option>Male</option>
-                  <option>Female</option>
-                  <option>Other</option>
-                </select>
-              </div>
+              <FormInput name="email" label="Email Address" type="email" placeholder="john@example.com" />
+              <FormSelect 
+                name="gender" 
+                label="Gender" 
+                options={[
+                  { label: 'Male', value: 'Male' },
+                  { label: 'Female', value: 'Female' },
+                  { label: 'Other', value: 'Other' }
+                ]} 
+              />
             </div>
-            <FormInput name="address" label="Home Address" defaultValue={selectedClient.address} />
+            <FormInput name="address" label="Home Address" placeholder="City, Area, Road" />
             <div className="pt-4 flex justify-end gap-2">
-              <Button bgColor="#333333" className="w-full rounded-lg py-4 shadow-xl text-white">Update Client Record</Button>
+              <Button type="submit" bgColor="#333333" className="w-full rounded-lg py-4 shadow-xl">Confirm Client Registration</Button>
             </div>
           </form>
-        )}
-      </EditModal>
+        </FormProvider>
+      </AddAddModal>
+
+      <EditEditModal title="Edit Client Details">
+        <FormProvider {...editMethods}>
+          <form className="space-y-4" onSubmit={editMethods.handleSubmit(onEditSubmit)}>
+            <div className="grid grid-cols-2 gap-4">
+              <FormInput name="name" label="Full Name" />
+              <FormInput name="phone" label="Phone Number" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <FormInput name="email" label="Email Address" type="email" />
+              <FormSelect 
+                name="gender" 
+                label="Gender" 
+                options={[
+                  { label: 'Male', value: 'Male' },
+                  { label: 'Female', value: 'Female' },
+                  { label: 'Other', value: 'Other' }
+                ]} 
+              />
+            </div>
+            <FormInput name="address" label="Home Address" />
+            <div className="pt-4 flex justify-end gap-2">
+              <Button type="submit" bgColor="#333333" className="w-full rounded-lg py-4 shadow-xl text-white">Update Client Record</Button>
+            </div>
+          </form>
+        </FormProvider>
+      </EditEditModal>
 
       <DeleteModal title="Confirm Client Deletion">
         <Delete handleDelete={handleDelete} />

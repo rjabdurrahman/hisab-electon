@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
 import BasicTable from '../components/table/BasicTable';
 import { ITableColumn } from '../components/table/ITable';
 import FormInput from '../components/form/FormInput';
+import FormSelect from '../components/form/FormSelect';
 import Button from '../components/buttons/Button';
 import usePopup from '../hooks/usePopup';
 import Delete from '../components/Delete';
@@ -27,15 +29,32 @@ const Doctor = () => {
 
   const [selectedDoctor, setSelectedDoctor] = useState<DoctorData | null>(null);
 
+  // Forms
+  const addMethods = useForm<DoctorData>();
+  const editMethods = useForm<DoctorData>();
+
   // Modals
-  const { openModal: openAdd, Modal: AddModal } = usePopup("large");
-  const { openModal: openEdit, Modal: EditModal } = usePopup("large");
-  const { openModal: openDelete, Modal: DeleteModal } = usePopup("medium");
+  const { openModal: openAdd, Modal: AddModal, closeModal: closeAdd } = usePopup("large");
+  const { openModal: openEdit, Modal: EditModal, closeModal: closeEdit } = usePopup("large");
+  const { openModal: openDelete, Modal: DeleteModal, closeModal: closeDelete } = usePopup("medium");
+
+  const onAddSubmit = (data: DoctorData) => {
+    const newDoc = { ...data, id: doctors.length + 1 };
+    setDoctors([...doctors, newDoc]);
+    addMethods.reset();
+    closeAdd();
+  };
+
+  const onEditSubmit = (data: DoctorData) => {
+    setDoctors(doctors.map(d => d.id === selectedDoctor?.id ? { ...d, ...data } : d));
+    closeEdit();
+  };
 
   const handleDelete = () => {
     if (selectedDoctor) {
       setDoctors(doctors.filter(d => d.id !== selectedDoctor.id));
       setSelectedDoctor(null);
+      closeDelete();
     }
   };
 
@@ -60,7 +79,7 @@ const Doctor = () => {
           <Button
             variant="icon"
             size="extraSmall"
-            onClick={() => { setSelectedDoctor(row); openEdit(); }}
+            onClick={() => { setSelectedDoctor(row); editMethods.reset(row); openEdit(); }}
             textColor="#333333"
           >
             ✏️
@@ -80,10 +99,9 @@ const Doctor = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      {/* Header Section */}
       <div className="flex items-center justify-between pb-4 border-b border-divider">
         <div>
-          <h1 className="text-2xl font-black text-[#333333] tracking-widest uppercase font-exo2">Doctor</h1>
+          <h1 className="text-2xl font-black text-[#333333] tracking-widest uppercase font-exo2">Doctor Management</h1>
         </div>
         <Button
           onClick={openAdd}
@@ -94,91 +112,98 @@ const Doctor = () => {
           + Add New Doctor
         </Button>
       </div>
+
       <div className="bg-white border border-[#D1D5DB] rounded shadow-sm overflow-hidden">
         <BasicTable columns={columns} data={doctors} />
       </div>
+
       <AddModal title="Register New Practitioner">
-        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); }}>
-          <div className="grid grid-cols-2 gap-4">
-            <FormInput name="name" label="Full Name" placeholder="e.g. Dr. John Doe" />
-            <FormInput name="email" label="Email Address" type="email" placeholder="john@example.com" />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <FormInput name="specialty" label="Medical Specialty" placeholder="e.g. Neurology" />
-            <FormInput name="phone" label="Contact Number" placeholder="e.g. 01700000000" />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="block text-[#475569] mb-1 pl-1 font-bold text-[12px] uppercase tracking-wider">Gender</label>
-              <select className="w-full px-3 py-2 rounded bg-[#F4F4F4F2] border border-gray-300 focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 outline-none transition-all font-bold text-[13px] appearance-none">
-                <option>Male</option>
-                <option>Female</option>
-                <option>Other</option>
-              </select>
+        <FormProvider {...addMethods}>
+          <form className="space-y-4" onSubmit={addMethods.handleSubmit(onAddSubmit)}>
+            <div className="grid grid-cols-2 gap-4">
+              <FormInput name="name" label="Full Name" placeholder="e.g. Dr. John Doe" required="Name is required" />
+              <FormInput name="email" label="Email Address" type="email" placeholder="john@example.com" />
             </div>
-            <div className="space-y-1">
-              <label className="block text-[#475569] mb-1 pl-1 font-bold text-[12px] uppercase tracking-wider">Availability Shift</label>
-              <select className="w-full px-3 py-2 rounded bg-[#F4F4F4F2] border border-gray-300 focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 outline-none transition-all font-bold text-[13px] appearance-none">
-                <option>Morning</option>
-                <option>Afternoon</option>
-                <option>Evening</option>
-              </select>
+            <div className="grid grid-cols-2 gap-4">
+              <FormInput name="specialty" label="Medical Specialty" placeholder="e.g. Cardiology" required="Specialty is required" />
+              <FormInput name="phone" label="Contact Number" placeholder="e.g. 01700000000" />
             </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <FormInput name="date" label="Joining Date" type="date" />
-            <FormInput name="address" label="Home Address" placeholder="City, Area, Road" />
-          </div>
-          <div className="pt-4 flex justify-end gap-2">
-            <Button bgColor="#333333" className="w-full rounded-lg py-4 shadow-xl">Confirm Registration</Button>
-          </div>
-        </form>
+            <div className="grid grid-cols-2 gap-4">
+              <FormSelect 
+                name="gender" 
+                label="Gender" 
+                options={[
+                  { label: 'Male', value: 'Male' },
+                  { label: 'Female', value: 'Female' },
+                  { label: 'Other', value: 'Other' }
+                ]} 
+              />
+              <FormSelect 
+                name="availability" 
+                label="Availability Shift" 
+                options={[
+                  { label: 'Morning', value: 'Morning' },
+                  { label: 'Afternoon', value: 'Afternoon' },
+                  { label: 'Evening', value: 'Evening' }
+                ]} 
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <FormInput name="joiningDate" label="Joining Date" type="date" />
+              <FormInput name="address" label="Home Address" placeholder="City, Area, Road" />
+            </div>
+            <div className="pt-4 flex justify-end gap-2">
+              <Button type="submit" bgColor="#333333" className="w-full rounded-lg py-4 shadow-xl">Confirm Registration</Button>
+            </div>
+          </form>
+        </FormProvider>
       </AddModal>
 
       <EditModal title="Edit Practitioner Details">
-        {selectedDoctor && (
-          <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); }}>
+        <FormProvider {...editMethods}>
+          <form className="space-y-4" onSubmit={editMethods.handleSubmit(onEditSubmit)}>
             <div className="grid grid-cols-2 gap-4">
-              <FormInput name="name" label="Full Name" defaultValue={selectedDoctor.name} />
-              <FormInput name="email" label="Email Address" type="email" defaultValue={selectedDoctor.email} />
+              <FormInput name="name" label="Full Name" />
+              <FormInput name="email" label="Email Address" type="email" />
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <FormInput name="specialty" label="Medical Specialty" defaultValue={selectedDoctor.specialty} />
-              <FormInput name="phone" label="Contact Number" defaultValue={selectedDoctor.phone} />
+              <FormInput name="specialty" label="Medical Specialty" />
+              <FormInput name="phone" label="Contact Number" />
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="block text-[#475569] mb-1 pl-1 font-bold text-[12px] uppercase tracking-wider">Gender</label>
-                <select defaultValue={selectedDoctor.gender} className="w-full px-3 py-2 rounded bg-[#F4F4F4F2] border border-gray-300 focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 outline-none transition-all font-bold text-[13px] appearance-none">
-                  <option>Male</option>
-                  <option>Female</option>
-                  <option>Other</option>
-                </select>
-              </div>
-              <div className="space-y-1">
-                <label className="block text-[#475569] mb-1 pl-1 font-bold text-[12px] uppercase tracking-wider">Availability Shift</label>
-                <select defaultValue={selectedDoctor.availability} className="w-full px-3 py-2 rounded bg-[#F4F4F4F2] border border-gray-300 focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 outline-none transition-all font-bold text-[13px] appearance-none">
-                  <option>Morning</option>
-                  <option>Afternoon</option>
-                  <option>Evening</option>
-                </select>
-              </div>
+              <FormSelect 
+                name="gender" 
+                label="Gender" 
+                options={[
+                  { label: 'Male', value: 'Male' },
+                  { label: 'Female', value: 'Female' },
+                  { label: 'Other', value: 'Other' }
+                ]} 
+              />
+              <FormSelect 
+                name="availability" 
+                label="Availability Shift" 
+                options={[
+                  { label: 'Morning', value: 'Morning' },
+                  { label: 'Afternoon', value: 'Afternoon' },
+                  { label: 'Evening', value: 'Evening' }
+                ]} 
+              />
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <FormInput name="date" label="Joining Date" type="date" defaultValue={selectedDoctor.joiningDate} />
-              <FormInput name="address" label="Home Address" defaultValue={selectedDoctor.address} />
+              <FormInput name="joiningDate" label="Joining Date" type="date" />
+              <FormInput name="address" label="Home Address" />
             </div>
             <div className="pt-4 flex justify-end gap-2">
-              <Button bgColor="#333333" className="w-full rounded-lg py-4 shadow-xl text-white">Update Record</Button>
+              <Button type="submit" bgColor="#333333" className="w-full rounded-lg py-4 shadow-xl text-white">Update Record</Button>
             </div>
           </form>
-        )}
+        </FormProvider>
       </EditModal>
 
       <DeleteModal title="Confirm Deletion">
         <Delete handleDelete={handleDelete} />
       </DeleteModal>
-
     </div>
   );
 };

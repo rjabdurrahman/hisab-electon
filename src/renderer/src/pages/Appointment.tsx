@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
 import BasicTable from '../components/table/BasicTable';
 import { ITableColumn } from '../components/table/ITable';
 import FormInput from '../components/form/FormInput';
@@ -24,20 +25,62 @@ const Appointment = () => {
     { id: 3, clientName: 'Zayan Ahmed', doctorName: 'Dr. Ashraful Islam', serviceName: 'X-Ray Chest', date: '2023-11-02', time: '09:00 AM', status: 'Completed' },
   ]);
 
-  const clients = ['Abdur Rahman', 'Fatima Begum', 'Zayan Ahmed', 'Karin Sultana'];
-  const doctors = ['Dr. Mahbubur Rahman', 'Dr. Nasrin Akter', 'Dr. Ashraful Islam', 'Dr. S.M. Ali'];
-  const services = ['General Consultation', 'Dental Checkup', 'X-Ray Chest', 'Blood Test', 'Eye Exam'];
+  const clients = [
+    { label: 'Abdur Rahman', value: 'Abdur Rahman' },
+    { label: 'Fatima Begum', value: 'Fatima Begum' },
+    { label: 'Zayan Ahmed', value: 'Zayan Ahmed' },
+    { label: 'Karin Sultana', value: 'Karin Sultana' }
+  ];
+
+  const doctors = [
+    { label: 'Dr. Mahbubur Rahman', value: 'Dr. Mahbubur Rahman' },
+    { label: 'Dr. Nasrin Akter', value: 'Dr. Nasrin Akter' },
+    { label: 'Dr. Ashraful Islam', value: 'Dr. Ashraful Islam' },
+    { label: 'Dr. S.M. Ali', value: 'Dr. S.M. Ali' }
+  ];
+
+  const services = [
+    { label: 'General Consultation', value: 'General Consultation' },
+    { label: 'Dental Checkup', value: 'Dental Checkup' },
+    { label: 'X-Ray Chest', value: 'X-Ray Chest' },
+    { label: 'Blood Test', value: 'Blood Test' },
+    { label: 'Eye Exam', value: 'Eye Exam' }
+  ];
+
+  const statuses = [
+    { label: 'Pending', value: 'Pending' },
+    { label: 'Confirmed', value: 'Confirmed' },
+    { label: 'Completed', value: 'Completed' },
+    { label: 'Cancelled', value: 'Cancelled' }
+  ];
 
   const [selectedAppointment, setSelectedAppointment] = useState<AppointmentData | null>(null);
 
-  const { openModal: openAdd, Modal: AddModal } = usePopup("large");
-  const { openModal: openEdit, Modal: EditModal } = usePopup("large");
-  const { openModal: openDelete, Modal: DeleteModal } = usePopup("medium");
+  // Forms
+  const addMethods = useForm<AppointmentData>();
+  const editMethods = useForm<AppointmentData>();
+
+  const { openModal: openAdd, Modal: AddModal, closeModal: closeAdd } = usePopup("large");
+  const { openModal: openEdit, Modal: EditModal, closeModal: closeEdit } = usePopup("large");
+  const { openModal: openDelete, Modal: DeleteModal, closeModal: closeDelete } = usePopup("medium");
+
+  const onAddSubmit = (data: AppointmentData) => {
+    const newIdx = appointments.length + 1;
+    setAppointments([...appointments, { ...data, id: newIdx }]);
+    addMethods.reset();
+    closeAdd();
+  };
+
+  const onEditSubmit = (data: AppointmentData) => {
+    setAppointments(appointments.map(a => a.id === selectedAppointment?.id ? { ...a, ...data } : a));
+    closeEdit();
+  };
 
   const handleDelete = () => {
     if (selectedAppointment) {
       setAppointments(appointments.filter(a => a.id !== selectedAppointment.id));
       setSelectedAppointment(null);
+      closeDelete();
     }
   };
 
@@ -64,7 +107,7 @@ const Appointment = () => {
           <Button
             variant="icon"
             size="extraSmall"
-            onClick={() => { setSelectedAppointment(row); openEdit(); }}
+            onClick={() => { setSelectedAppointment(row); editMethods.reset(row); openEdit(); }}
             textColor="#333333"
           >
             ✏️
@@ -103,91 +146,90 @@ const Appointment = () => {
       </div>
 
       <AddModal title="New Appointment Booking">
-        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); }}>
-          <div className="grid grid-cols-2 gap-4">
-            <FormSelect
-              name="client" 
-              label="Select Client" 
-              placeholder="Search Client..." 
-              options={clients.map(c => ({ label: c, value: c }))} 
-            />
-            <FormSelect 
-              name="doctor" 
-              label="Assign Doctor" 
-              placeholder="Select Practitioner..." 
-              options={doctors.map(d => ({ label: d, value: d }))} 
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <FormSelect 
-              name="service" 
-              label="Service Required" 
-              placeholder="Select Service..." 
-              options={services.map(s => ({ label: s, value: s }))} 
-            />
-            <div className="grid grid-cols-2 gap-2">
-               <FormInput name="date" label="Date" type="date" />
-               <FormInput name="time" label="Time" placeholder="10:00 AM" />
-            </div>
-          </div>
-          <FormSelect
-            name="status" 
-            label="Initial Status" 
-            options={[
-              { label: 'Pending', value: 'Pending' },
-              { label: 'Confirmed', value: 'Confirmed' }
-            ]} 
-          />
-          <div className="pt-4 flex justify-end gap-2">
-            <Button bgColor="#333333" className="w-full rounded-lg py-4 shadow-xl">Schedule Appointment</Button>
-          </div>
-        </form>
-      </AddModal>
-
-      <EditModal title="Modify Appointment Record">
-        {selectedAppointment && (
-          <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); }}>
+        <FormProvider {...addMethods}>
+          <form className="space-y-4" onSubmit={addMethods.handleSubmit(onAddSubmit)}>
             <div className="grid grid-cols-2 gap-4">
-               <FormSelect 
-                name="client" 
-                label="Client" 
-                value={selectedAppointment.clientName}
-                options={clients.map(c => ({ label: c, value: c }))} 
+              <FormSelect
+                name="clientName" 
+                label="Select Client" 
+                placeholder="Search Client..." 
+                options={clients} 
+                required="Client is required"
               />
               <FormSelect 
-                name="doctor" 
-                label="Doctor" 
-                value={selectedAppointment.doctorName}
-                options={doctors.map(d => ({ label: d, value: d }))} 
+                name="doctorName" 
+                label="Assign Doctor" 
+                placeholder="Select Practitioner..." 
+                options={doctors} 
+                required="Doctor is required"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <FormSelect 
-                name="service" 
-                label="Service" 
-                value={selectedAppointment.serviceName}
-                options={services.map(s => ({ label: s, value: s }))} 
+                name="serviceName" 
+                label="Service Required" 
+                placeholder="Select Service..." 
+                options={services} 
+                required="Service is required"
               />
               <div className="grid grid-cols-2 gap-2">
-                <FormInput name="date" label="Date" type="date" defaultValue={selectedAppointment.date} />
-                <FormInput name="time" label="Time" defaultValue={selectedAppointment.time} />
+                 <FormInput name="date" label="Date" type="date" required="Date" />
+                 <FormInput name="time" label="Time" placeholder="10:00 AM" required="Time" />
               </div>
             </div>
             <FormSelect
               name="status" 
-              label="Appointment Status" 
-              value={selectedAppointment.status}
+              label="Initial Status" 
               options={[
                 { label: 'Pending', value: 'Pending' },
-                { label: 'Confirmed', value: 'Confirmed' },
-                { label: 'Completed', value: 'Completed' },
-                { label: 'Cancelled', value: 'Cancelled' }
+                { label: 'Confirmed', value: 'Confirmed' }
               ]} 
+              required="Status"
             />
             <div className="pt-4 flex justify-end gap-2">
-              <Button bgColor="#333333" className="w-full rounded-lg py-4 shadow-xl text-white">Update Appointment</Button>
+              <Button type="submit" bgColor="#333333" className="w-full rounded-lg py-4 shadow-xl">Schedule Appointment</Button>
             </div>
           </form>
+        </FormProvider>
+      </AddModal>
+
+      <EditModal title="Modify Appointment Record">
+        {selectedAppointment && (
+          <FormProvider {...editMethods}>
+            <form className="space-y-4" onSubmit={editMethods.handleSubmit(onEditSubmit)}>
+              <div className="grid grid-cols-2 gap-4">
+                 <FormSelect 
+                  name="clientName" 
+                  label="Client" 
+                  options={clients} 
+                />
+                <FormSelect 
+                  name="doctorName" 
+                  label="Doctor" 
+                  options={doctors} 
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <FormSelect 
+                  name="serviceName" 
+                  label="Service" 
+                  options={services} 
+                />
+                <div className="grid grid-cols-2 gap-2">
+                  <FormInput name="date" label="Date" type="date" />
+                  <FormInput name="time" label="Time" />
+                </div>
+              </div>
+              <FormSelect
+                name="status" 
+                label="Appointment Status" 
+                options={statuses} 
+              />
+              <div className="pt-4 flex justify-end gap-2">
+                <Button type="submit" bgColor="#333333" className="w-full rounded-lg py-4 shadow-xl text-white">Update Appointment</Button>
+              </div>
+            </form>
+          </FormProvider>
         )}
       </EditModal>
 
