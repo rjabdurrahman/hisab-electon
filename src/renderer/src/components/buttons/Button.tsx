@@ -37,7 +37,7 @@ const Button: React.FC<ButtonProps> = ({
   children,
 }) => {
   const baseStyles =
-    "inline-flex gap-1 items-center justify-center rounded focus:outline-none transition leading-none disabled:cursor-not-allowed disabled:bg-gray-400";
+    "inline-flex cursor-pointer gap-1 items-center justify-center rounded focus:outline-none transition leading-none disabled:cursor-not-allowed disabled:bg-gray-400";
 
   const sizeStyles: Record<ButtonSize, string> = {
     extraSmall: "px-2 py-1 text-[10px] min-h-[24px]",

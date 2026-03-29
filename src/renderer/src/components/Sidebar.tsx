@@ -27,7 +27,7 @@ const Sidebar: React.FC = () => {
           <button
             key={item.id}
             onClick={() => navigate(`/${item.id}`)}
-            className={`w-full flex items-center gap-4 px-6 py-4 text-[13px] font-bold tracking-wider transition-all duration-200 border-l-4
+            className={`w-full flex cursor-pointer items-center gap-4 px-6 py-4 text-[13px] font-bold tracking-wider transition-all duration-200 border-l-4
               ${currentPath === item.id 
                 ? 'bg-[#FEFEFE0F] text-[#2CAFFE] border-[#2CAFFE]' 
                 : 'border-transparent hover:bg-[#FEFEFE0F] hover:text-white'

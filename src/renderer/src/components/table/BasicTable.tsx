@@ -74,7 +74,7 @@ const BasicTable: React.FC<TableProps> = ({
   ));
 
   const miniRows = data.map((row, idx) => (
-    <tr key={idx} className="bg-white border-b border-gray-100 p-4 block md:hidden mb-2 rounded shadow-sm">
+    <tr key={idx} className="bg-white border-b border-gray-100 p-4 block md:hidden mb-2 rounded">
       {miniColumns?.map((column) => (
         <td key={column.label + column.key} className={clsx("block py-1", column.rowClass)}>
           <span className="font-bold text-[9px] uppercase tracking-tighter text-gray-400 mr-2">{column.label}:</span>
@@ -118,7 +118,7 @@ const BasicTable: React.FC<TableProps> = ({
   return (
     <div
       className={clsx(
-        "overflow-auto border border-divider shadow-sm rounded bg-white",
+        "overflow-auto rounded bg-white",
         className
       )}
     >

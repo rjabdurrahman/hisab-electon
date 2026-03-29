@@ -6,7 +6,7 @@ const UserPanelLayout = () => {
     <div className="min-h-screen flex bg-canvas transition-colors duration-300">
       <Sidebar />
       <div className="flex-1 min-h-screen overflow-auto">
-        <main className="px-6 py-8 md:px-10">
+        <main className="px-4 py-4 md:px-6">
           <Outlet />
         </main>
       </div>
