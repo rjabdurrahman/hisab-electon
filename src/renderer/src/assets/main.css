@@ -2,54 +2,54 @@
 
 /* 
   Tailwind v4 - CSS-first Theme Configuration
-  Mapping design tokens to CSS variables for dynamic switching.
+  Mapping design tokens to match pos-frontend-v2 exactly.
 */
 
 @theme {
   --font-sans: 'Inter', system-ui, sans-serif;
+  --font-exo2: "Exo 2", sans-serif;
   
-  /* Color Palette Utilities (Automatically generates text-*, bg-*, etc.) */
   --color-canvas: var(--bg-canvas);
   --color-surface: var(--bg-surface);
   --color-panel: var(--bg-panel);
-  --color-brand: #2563eb;
-  --color-brand-hover: #1d4ed8;
+  
+  --color-brand: #2CAFFE; /* Active color from pos-v2 */
+  --color-brand-hover: #1b9de6;
+  
+  --color-pos-primary: #333333;
+  --color-pos-secondary: #F4F4F4;
+  --color-pos-blue: #2563EB;
+  
   --color-ink-primary: var(--text-primary);
   --color-ink-secondary: var(--text-secondary);
   --color-ink-muted: var(--text-muted);
   --color-divider: var(--border-color);
 }
 
-/* 
-  CRITICAL: Tailwind v4 manual dark mode variant configuration.
-  This allows 'dark:' utilities to function correctly with the '.dark' class on <html>.
-*/
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Design Tokens - Semantic Mapping */
 :root {
-  --bg-canvas: #ffffff;
+  --bg-canvas: #f4f4f4; /* pos-v2 secondary bg */
   --bg-surface: #ffffff;
   --bg-panel: #fcfcfc;
-  --text-primary: #0f172a;
+  --text-primary: #333333; /* pos-v2 primary text */
   --text-secondary: #475569;
   --text-muted: #94a3b8;
-  --border-color: #f1f5f9;
+  --border-color: #d1d5db;
   --overlay: rgba(0, 0, 0, 0.4);
 }
 
 .dark {
-  --bg-canvas: #09090b;
-  --bg-surface: #111827;
-  --bg-panel: #1f2937;
+  --bg-canvas: #111111;
+  --bg-surface: #1e1e1e;
+  --bg-panel: #262626;
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
-  --border-color: #334155;
+  --border-color: #333333;
   --overlay: rgba(0, 0, 0, 0.7);
 }
 
-/* Base Styles */
 body {
   margin: 0;
   padding: 0;
@@ -57,56 +57,48 @@ body {
   color: var(--text-primary);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
-  transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Component Level Utilities */
-.btn {
-  @apply px-4 py-2 rounded-md font-semibold text-sm transition-all active:scale-[0.98] border;
+/* pos-v2 style buttons */
+.btn-pos {
+  @apply px-4 py-2 rounded font-semibold text-sm transition-all active:scale-[0.98] border;
 }
 
-.input {
-  @apply w-full rounded-md px-4 py-3 text-sm outline-none transition-all;
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
+/* pos-v2 style inputs */
+.input-field {
+  @apply border border-gray-300 rounded bg-[#F4F4F4F2] px-3 py-2 focus:ring focus:ring-blue-500/20 focus:outline-none transition-all;
 }
 
-.input:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-/* Modal UI */
 .modal-overlay {
   position: fixed;
   inset: 0;
   background-color: var(--overlay);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 100;
-  animation: fadeIn 0.2s ease-out;
 }
 
 .modal-content {
   width: 100%;
   max-width: 440px;
-  padding: 2.5rem;
-  border-radius: 0.75rem;
+  padding: 2rem;
+  border-radius: 4px;
   background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
-  box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.15);
-  animation: modalIn 0.2s ease-out;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+/* Custom Scrollbar to match pos-v2 */
+::-webkit-scrollbar {
+  @apply w-[6px];
 }
 
-@keyframes modalIn {
-  from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+::-webkit-scrollbar-track {
+  @apply bg-gray-200 rounded-md;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 rounded-sm;
 }
