@@ -1,16 +1,17 @@
 import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-interface SidebarProps {
-  currentPage: string;
-  setCurrentPage: (page: 'dashboard' | 'appointment' | 'doctor' | 'client') => void;
-}
+const Sidebar: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname.split('/')[1] || 'dashboard';
 
-const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage }) => {
   const menuItems = [
     { id: 'dashboard', label: 'DASHBOARD', icon: '📊' },
     { id: 'appointment', label: 'APPOINTMENT', icon: '📅' },
     { id: 'doctor', label: 'DOCTOR', icon: '👨‍⚕️' },
     { id: 'client', label: 'CLIENT', icon: '👥' },
+    { id: 'service', label: 'SERVICE', icon: '💼' },
   ];
 
   return (
@@ -25,14 +26,14 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage }) => {
         {menuItems.map((item) => (
           <button
             key={item.id}
-            onClick={() => setCurrentPage(item.id as any)}
+            onClick={() => navigate(`/${item.id}`)}
             className={`w-full flex items-center gap-4 px-6 py-4 text-[13px] font-bold tracking-wider transition-all duration-200 border-l-4
-              ${currentPage === item.id 
+              ${currentPath === item.id 
                 ? 'bg-[#FEFEFE0F] text-[#2CAFFE] border-[#2CAFFE]' 
                 : 'border-transparent hover:bg-[#FEFEFE0F] hover:text-white'
               }`}
           >
-            <span className={`text-lg ${currentPage === item.id ? 'text-[#2CAFFE]' : 'opacity-70 group-hover:opacity-100'}`}>
+            <span className={`text-lg ${currentPath === item.id ? 'text-[#2CAFFE]' : 'opacity-70 group-hover:opacity-100'}`}>
               {item.icon}
             </span>
             {item.label}
