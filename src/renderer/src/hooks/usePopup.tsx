@@ -33,7 +33,7 @@ const usePopup = (
         >
           {/* Header */}
           <div className="flex justify-between items-center border-b-[1.5px] border-gray-100 p-3 bg-white rounded-t">
-            <h2 className="text-[14px] font-black text-[#333333] uppercase tracking-widest font-exo2">{title}</h2>
+            <h2 className="text-[14px] font-black text-[#333333] font-exo2">{title}</h2>
             <button
               className="text-gray-400 hover:text-black hover:bg-gray-100 rounded w-6 h-6 flex items-center justify-center transition-all leading-none pb-1"
               onClick={closeModal}

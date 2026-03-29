@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { useForm, FormProvider } from 'react-hook-form';
 import BasicTable from '../components/table/BasicTable';
 import { ITableColumn } from '../components/table/ITable';
-import FormInput from '../components/form/FormInput';
-import FormSelect from '../components/form/FormSelect';
 import Button from '../components/buttons/Button';
 import usePopup from '../hooks/usePopup';
 import Delete from '../components/Delete';
+import ClientAdd from '../components/popups/ClientAdd';
+import ClientEdit from '../components/popups/ClientEdit';
 
 interface ClientData {
   id: number;
@@ -27,22 +26,17 @@ const Client = () => {
 
   const [selectedClient, setSelectedClient] = useState<ClientData | null>(null);
 
-  // Forms
-  const addMethods = useForm<ClientData>();
-  const editMethods = useForm<ClientData>();
-
-  const { openModal: openAdd, Modal: AddAddModal, closeModal: closeAdd } = usePopup("large");
-  const { openModal: openEdit, Modal: EditEditModal, closeModal: closeEdit } = usePopup("large");
+  const { openModal: openAdd, Modal: AddModal, closeModal: closeAdd } = usePopup("large");
+  const { openModal: openEdit, Modal: EditModal, closeModal: closeEdit } = usePopup("large");
   const { openModal: openDelete, Modal: DeleteModal, closeModal: closeDelete } = usePopup("medium");
 
-  const onAddSubmit = (data: ClientData) => {
+  const onAddSubmit = (data: any) => {
     const newIdx = clients.length + 1;
     setClients([...clients, { ...data, id: newIdx, registeredAt: new Date().toISOString().split('T')[0] }]);
-    addMethods.reset();
     closeAdd();
   };
 
-  const onEditSubmit = (data: ClientData) => {
+  const onEditSubmit = (data: any) => {
     setClients(clients.map(c => c.id === selectedClient?.id ? { ...c, ...data } : c));
     closeEdit();
   };
@@ -68,7 +62,7 @@ const Client = () => {
           <Button
             variant="icon"
             size="extraSmall"
-            onClick={() => { setSelectedClient(row); editMethods.reset(row); openEdit(); }}
+            onClick={() => { setSelectedClient(row); openEdit(); }}
             textColor="#333333"
           >
             ✏️
@@ -88,17 +82,17 @@ const Client = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      <div className="flex items-center justify-between pb-4 border-b border-divider">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black text-[#333333] tracking-widest uppercase font-exo2">Clients</h1>
+          <h1 className="text-2xl font-black text-[#333333] font-exo2">Clients</h1>
         </div>
         <Button
           onClick={openAdd}
           bgColor="#333333"
           textColor="#FFFFFF"
-          className="rounded px-6 py-3 shadow-lg shadow-[#333333]/20"
+          className="rounded px-6 py-3"
         >
-          + Add New Client
+          + New
         </Button>
       </div>
 
@@ -106,61 +100,21 @@ const Client = () => {
         <BasicTable columns={columns} data={clients} />
       </div>
 
-      <AddAddModal title="Register New Client">
-        <FormProvider {...addMethods}>
-          <form className="space-y-4" onSubmit={addMethods.handleSubmit(onAddSubmit)}>
-            <div className="grid grid-cols-2 gap-4">
-              <FormInput name="name" label="Full Name" placeholder="e.g. John Doe" required="Name is required" />
-              <FormInput name="phone" label="Phone Number" placeholder="e.g. 01700000000" required="Phone is required" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <FormInput name="email" label="Email Address" type="email" placeholder="john@example.com" />
-              <FormSelect 
-                name="gender" 
-                label="Gender" 
-                options={[
-                  { label: 'Male', value: 'Male' },
-                  { label: 'Female', value: 'Female' },
-                  { label: 'Other', value: 'Other' }
-                ]} 
-              />
-            </div>
-            <FormInput name="address" label="Home Address" placeholder="City, Area, Road" />
-            <div className="pt-4 flex justify-end gap-2">
-              <Button type="submit" bgColor="#333333" className="w-full rounded-lg py-4 shadow-xl">Confirm Client Registration</Button>
-            </div>
-          </form>
-        </FormProvider>
-      </AddAddModal>
+      <AddModal title="New Client">
+        <ClientAdd onSubmit={onAddSubmit} onCancel={closeAdd} />
+      </AddModal>
 
-      <EditEditModal title="Edit Client Details">
-        <FormProvider {...editMethods}>
-          <form className="space-y-4" onSubmit={editMethods.handleSubmit(onEditSubmit)}>
-            <div className="grid grid-cols-2 gap-4">
-              <FormInput name="name" label="Full Name" />
-              <FormInput name="phone" label="Phone Number" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <FormInput name="email" label="Email Address" type="email" />
-              <FormSelect 
-                name="gender" 
-                label="Gender" 
-                options={[
-                  { label: 'Male', value: 'Male' },
-                  { label: 'Female', value: 'Female' },
-                  { label: 'Other', value: 'Other' }
-                ]} 
-              />
-            </div>
-            <FormInput name="address" label="Home Address" />
-            <div className="pt-4 flex justify-end gap-2">
-              <Button type="submit" bgColor="#333333" className="w-full rounded-lg py-4 shadow-xl text-white">Update Client Record</Button>
-            </div>
-          </form>
-        </FormProvider>
-      </EditEditModal>
+      <EditModal title="Edit Client">
+        {selectedClient && (
+          <ClientEdit 
+            initialData={selectedClient} 
+            onSubmit={onEditSubmit} 
+            onCancel={closeEdit} 
+          />
+        )}
+      </EditModal>
 
-      <DeleteModal title="Confirm Client Deletion">
+      <DeleteModal title="Confirm Profile Deletion">
         <Delete handleDelete={handleDelete} />
       </DeleteModal>
     </div>

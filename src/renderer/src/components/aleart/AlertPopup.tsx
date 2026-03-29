@@ -40,7 +40,7 @@ const AlertPopup: React.FC<AlertPopupProps> = ({ message, type, duration = 3000,
     <div className="fixed top-4 right-4 z-100 animate-in slide-in-from-right duration-300">
       <div className={`${getColorClass()} text-white px-5 py-3 rounded-lg shadow-xl flex items-center justify-between min-w-[300px]`}>
         <div className="flex flex-col">
-          <span className="font-bold text-xs uppercase opacity-80 mb-0.5">{type}</span>
+          <span className="font-bold text-xs  opacity-80 mb-0.5">{type}</span>
           <span className="text-sm font-medium">{message}</span>
         </div>
         <button onClick={() => setVisible(false)} className="ml-4 text-white/50 hover:text-white transition-colors text-xl font-bold leading-none">

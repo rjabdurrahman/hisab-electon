@@ -20,7 +20,7 @@ const BasicTable: React.FC<TableProps> = ({
   onlyTable = false,
   className = "",
   BlankElement = (
-    <div className="w-full text-center p-8 font-black uppercase tracking-widest mt-4 bg-[#F4F4F4] text-slate-400 rounded-sm border-2 border-dashed border-gray-200 text-[10px]">
+    <div className="w-full text-center p-8 font-black  t mt-4 bg-[#F4F4F4] text-slate-400 rounded-sm border-2 border-dashed border-gray-200 text-[10px]">
       No records found
     </div>
   ),
@@ -39,7 +39,7 @@ const BasicTable: React.FC<TableProps> = ({
       <th
         key={column.label + column.key}
         className={clsx(
-          "text-left p-3 font-bold uppercase tracking-widest text-white border-b border-divider bg-[#333333] sticky top-0 z-1 text-[10px]",
+          "text-left p-3 font-bold  t text-white border-b border-divider bg-[#333333] sticky top-0 z-1 text-[10px]",
           column.headClass
         )}
       >
@@ -57,16 +57,16 @@ const BasicTable: React.FC<TableProps> = ({
           else column.rowClass = "print:hidden";
         }
         return (
-          <td key={column.label + column.key} 
-              className={clsx(
-                "p-3 text-[#333333] border-b border-[#D1D5DB] text-[12px] font-medium transition-all group-hover:border-[#2563EB]/20",
-                column.rowClass
-              )}>
+          <td key={column.label + column.key}
+            className={clsx(
+              "p-3 text-[#333333] border-b border-[#D1D5DB] text-[12px] font-medium transition-all group-hover:border-[#2563EB]/20",
+              column.rowClass
+            )}>
             {column.key === "sl"
               ? idx + 1
               : column.render
-              ? column?.render(_get(row, column.key), row, idx)
-              : _get(row, column.key)}
+                ? column?.render(_get(row, column.key), row, idx)
+                : _get(row, column.key)}
           </td>
         );
       })}
@@ -77,13 +77,13 @@ const BasicTable: React.FC<TableProps> = ({
     <tr key={idx} className="bg-white border-b border-gray-100 p-4 block md:hidden mb-2 rounded">
       {miniColumns?.map((column) => (
         <td key={column.label + column.key} className={clsx("block py-1", column.rowClass)}>
-          <span className="font-bold text-[9px] uppercase tracking-tighter text-gray-400 mr-2">{column.label}:</span>
+          <span className="font-bold text-[9px]  tracking-tighter text-gray-400 mr-2">{column.label}:</span>
           <span className="text-[12px] font-medium text-[#333333]">
             {column.key === "sl"
               ? idx + 1
               : column.render
-              ? column?.render(_get(row, column.key), row, idx)
-              : _get(row, column.key)}
+                ? column?.render(_get(row, column.key), row, idx)
+                : _get(row, column.key)}
           </span>
         </td>
       ))}
