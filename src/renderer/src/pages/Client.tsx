@@ -114,7 +114,7 @@ const Client = () => {
         )}
       </EditModal>
 
-      <DeleteModal title="Confirm Profile Deletion">
+      <DeleteModal title="Delete">
         <Delete handleDelete={handleDelete} />
       </DeleteModal>
     </div>

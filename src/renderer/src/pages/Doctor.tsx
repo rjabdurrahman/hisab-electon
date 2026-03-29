@@ -125,7 +125,7 @@ const Doctor = () => {
         )}
       </EditModal>
 
-      <DeleteModal title="Confirm Deletion">
+      <DeleteModal title="Delete">
         <Delete handleDelete={handleDelete} />
       </DeleteModal>
     </div>

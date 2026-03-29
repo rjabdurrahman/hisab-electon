@@ -115,7 +115,7 @@ const Service = () => {
         )}
       </EditModal>
 
-      <DeleteModal title="Remove Configuration">
+      <DeleteModal title="Delete">
         <Delete handleDelete={handleDelete} />
       </DeleteModal>
     </div>

@@ -148,7 +148,7 @@ const Appointment = () => {
         )}
       </EditModal>
 
-      <DeleteModal title="Cancel & Delete">
+      <DeleteModal title="Delete">
         <Delete handleDelete={handleDelete} />
       </DeleteModal>
     </div>
