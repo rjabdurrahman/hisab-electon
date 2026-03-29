@@ -1,0 +1,10 @@
+node_modules
+dist
+out
+build
+release
+.DS_Store
+.eslintcache
+*.log*
+database.sqlite
+.env
