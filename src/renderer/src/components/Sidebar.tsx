@@ -8,16 +8,16 @@ const Sidebar: React.FC = () => {
 
   const menuItems = [
     { id: 'dashboard', label: 'DASHBOARD', icon: '📊' },
-    { id: 'appointment', label: 'APPOINTMENT', icon: '📅' },
+    { id: 'test', label: 'TESTS', icon: '🧪' },
     { id: 'doctor', label: 'DOCTOR', icon: '👨‍⚕️' },
-    { id: 'client', label: 'CLIENT', icon: '👥' },
-    { id: 'service', label: 'SERVICE', icon: '💼' },
+    { id: 'client', label: 'PATIENT', icon: '👥' },
+    { id: 'service', label: 'TEST SERVICE', icon: '💼' },
   ];
 
   return (
     <div className="w-[240px] h-screen bg-[#333333] text-[#FFFFFF] flex flex-col sticky top-0 left-0 transition-all duration-300 shadow-lg">
       <div className="p-6 border-b border-gray-600 flex items-center justify-between">
-        <h1 className="text-xl font-black text-white t flex items-center gap-2 font-exo2">
+        <h1 className="text-xl font-black text-white flex items-center gap-2 font-exo2">
           HISAB-KHATA
         </h1>
       </div>
@@ -43,12 +43,12 @@ const Sidebar: React.FC = () => {
 
       <div className="p-4 border-t border-gray-600">
         <div className="bg-[#FEFEFE0F] rounded p-3 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs  shadow-active/20 shadow-md">
+          <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs shadow-active/20 shadow-md">
             AA
           </div>
           <div className="flex-1 overflow-hidden">
-            <p className="text-[12px] font-bold text-white truncate  tracking-tighter">Abdur Rahman</p>
-            <p className="text-[10px] text-gray-400 truncate  mt-0.5">Administrator</p>
+            <p className="text-[12px] font-bold text-white truncate tracking-tighter">Abdur Rahman</p>
+            <p className="text-[10px] text-gray-400 truncate mt-0.5">Administrator</p>
           </div>
         </div>
       </div>

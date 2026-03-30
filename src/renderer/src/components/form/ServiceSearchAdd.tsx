@@ -3,10 +3,11 @@ import React, { useState, useRef, useEffect } from "react";
 interface ServiceItem {
   id: number | string;
   label: string;
+  price: number;
 }
 
 interface ServiceSearchAddProps {
-  options: { value: string | number; label: string }[];
+  options: { value: string | number; label: string; price: number }[];
   addedServices: ServiceItem[];
   onAdd: (service: ServiceItem) => void;
   onRemove: (id: string | number) => void;
@@ -38,16 +39,18 @@ const ServiceSearchAdd: React.FC<ServiceSearchAddProps> = ({
   }, []);
 
   const handleAdd = (opt: any) => {
-    onAdd({ id: opt.value, label: opt.label });
+    onAdd({ id: opt.value, label: opt.label, price: opt.price });
     setSearchTerm("");
     setIsOpen(false);
   };
+
+  const totalPrice = addedServices.reduce((sum, s) => sum + s.price, 0);
 
   return (
     <div className="w-full space-y-4" ref={containerRef}>
       <div className="relative">
         <label className="block text-gray-700 font-medium mb-1 text-left">
-          Search and Add Services
+          Search and Add Tests
         </label>
         <div 
           className={`flex items-center bg-white border rounded p-1 transition-all
@@ -61,7 +64,7 @@ const ServiceSearchAdd: React.FC<ServiceSearchAddProps> = ({
           </div>
           <input 
             className="w-full px-2 py-1.5 focus:outline-none text-sm placeholder-gray-400"
-            placeholder="Search service to add..."
+            placeholder="Search test to add..."
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
@@ -77,18 +80,21 @@ const ServiceSearchAdd: React.FC<ServiceSearchAddProps> = ({
                 filteredOptions.map((option) => (
                   <div
                     key={option.value}
-                    className="px-4 py-2.5 text-sm cursor-pointer hover:bg-pos-primary hover:text-white transition-colors flex items-center gap-3 border-b border-gray-50 last:border-0"
+                    className="px-4 py-2.5 text-sm cursor-pointer hover:bg-pos-primary hover:text-white transition-colors flex items-center justify-between border-b border-gray-50 last:border-0 group"
                     onClick={() => handleAdd(option)}
                   >
-                    <div className="w-6 h-6 flex items-center justify-center bg-gray-100 rounded text-[10px] font-bold group-hover:bg-white/20 transition-colors">
-                       ➕
+                    <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 flex items-center justify-center bg-gray-100 rounded text-[10px] font-bold group-hover:bg-white/20 transition-colors">
+                        ➕
+                        </div>
+                        <span>{option.label}</span>
                     </div>
-                    <span>{option.label}</span>
+                    <span className="font-mono font-bold text-blue-600 group-hover:text-white transition-colors">৳{option.price}</span>
                   </div>
                 ))
               ) : (
                 <div className="px-4 py-4 text-center text-gray-400 text-sm italic">
-                  No services found matching "{searchTerm}"
+                  No tests found matching "{searchTerm}"
                 </div>
               )}
             </div>
@@ -97,12 +103,19 @@ const ServiceSearchAdd: React.FC<ServiceSearchAddProps> = ({
       </div>
 
       <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
-        <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3 flex items-center justify-between">
-           Selected Services
-           <span className="bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded text-[10px] font-bold">
-              {addedServices.length} Total
-           </span>
-        </h3>
+        <div className="flex items-center justify-between mb-3">
+            <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                Selected Tests
+                <span className="bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded text-[10px] font-bold">
+                    {addedServices.length}
+                </span>
+            </h3>
+            {addedServices.length > 0 && (
+                <div className="text-sm font-black text-pos-primary">
+                   Total: <span className="text-blue-600">৳{totalPrice}</span>
+                </div>
+            )}
+        </div>
         
         {addedServices.length > 0 ? (
           <div className="space-y-1">
@@ -110,7 +123,10 @@ const ServiceSearchAdd: React.FC<ServiceSearchAddProps> = ({
               <div key={service.id} className="flex justify-between items-center bg-white p-2.5 rounded shadow-sm border border-gray-100 group animate-in slide-in-from-left duration-200" style={{ animationDelay: `${idx * 50}ms` }}>
                 <div className="flex items-center gap-3">
                    <span className="text-xs text-gray-400 font-mono">{(idx + 1).toString().padStart(2, '0')}</span>
-                   <span className="text-sm font-semibold text-pos-primary">{service.label}</span>
+                   <div className="flex flex-col">
+                        <span className="text-sm font-semibold text-pos-primary">{service.label}</span>
+                        <span className="text-[10px] font-bold text-blue-500 uppercase tracking-tighter">Price: ৳{service.price}</span>
+                   </div>
                 </div>
                 <button 
                   type="button"
@@ -125,7 +141,7 @@ const ServiceSearchAdd: React.FC<ServiceSearchAddProps> = ({
         ) : (
           <div className="py-6 flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded text-gray-400 gap-2">
              <div className="text-2xl">📋</div>
-             <p className="text-xs font-semibold italic">No services added yet</p>
+             <p className="text-xs font-semibold italic">No tests added yet</p>
           </div>
         )}
       </div>
