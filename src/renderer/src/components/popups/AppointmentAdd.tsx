@@ -1,13 +1,15 @@
 import React from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, useWatch } from "react-hook-form";
 import FormInput from "../form/FormInput";
 import FormSelect from "../form/FormSelect";
 import Button from "../buttons/Button";
+import SearchSelect from "../form/SearchSelect";
+import ServiceSearchAdd from "../form/ServiceSearchAdd";
 
 interface AppointmentData {
   clientName: string;
   doctorName: string;
-  serviceName: string;
+  services: { id: string | number; label: string }[];
   date: string;
   time: string;
   status: 'Pending' | 'Confirmed' | 'Cancelled' | 'Completed';
@@ -28,25 +30,36 @@ const AppointmentAdd: React.FC<AppointmentAddProps> = ({ onSubmit, onCancel, opt
     defaultValues: {
       clientName: "",
       doctorName: "",
-      serviceName: "",
+      services: [],
       date: new Date().toISOString().split('T')[0],
       time: "10:00 AM",
       status: "Pending"
     }
   });
 
+  const { control, setValue } = methods;
+  const addedServices = useWatch({ control, name: "services" }) || [];
+
+  const handleAddService = (service: { id: string | number; label: string }) => {
+    setValue("services", [...addedServices, service]);
+  };
+
+  const handleRemoveService = (id: string | number) => {
+    setValue("services", addedServices.filter(s => s.id !== id));
+  };
+
   return (
     <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
-          <FormSelect
+          <SearchSelect
             name="clientName" 
             label="Select Client" 
             placeholder="Search Client..." 
             options={options.clients} 
             required="Client is required"
           />
-          <FormSelect 
+          <SearchSelect 
             name="doctorName" 
             label="Assign Doctor" 
             placeholder="Select Practitioner..." 
@@ -54,32 +67,38 @@ const AppointmentAdd: React.FC<AppointmentAddProps> = ({ onSubmit, onCancel, opt
             required="Doctor is required"
           />
         </div>
+
+        <div className="border-t border-gray-100 pt-4">
+            <ServiceSearchAdd 
+              options={options.services}
+              addedServices={addedServices}
+              onAdd={handleAddService}
+              onRemove={handleRemoveService}
+            />
+            {methods.formState.errors.services && (
+              <p className="text-red-500 text-xs mt-1 font-bold italic">At least one service is required</p>
+            )}
+        </div>
+
         <div className="grid grid-cols-2 gap-4">
-          <FormSelect 
-            name="serviceName" 
-            label="Service Required" 
-            placeholder="Select Service..." 
-            options={options.services} 
-            required="Service is required"
-          />
           <div className="grid grid-cols-2 gap-2">
              <FormInput name="date" label="Date" type="date" required="Date" />
              <FormInput name="time" label="Time" placeholder="10:00 AM" required="Time" />
           </div>
+          <FormSelect
+            name="status" 
+            label="Initial Status" 
+            options={[
+              { label: 'Pending', value: 'Pending' },
+              { label: 'Confirmed', value: 'Confirmed' }
+            ]} 
+            required="Status"
+          />
         </div>
-        <FormSelect
-          name="status" 
-          label="Initial Status" 
-          options={[
-            { label: 'Pending', value: 'Pending' },
-            { label: 'Confirmed', value: 'Confirmed' }
-          ]} 
-          required="Status"
-        />
         
         <div className="pt-6 flex justify-end gap-2 border-t border-gray-100 -mx-5 px-5">
           <Button
-            className="flex-1"
+            className="px-8"
             size="large"
             variant="outlined"
             onClick={onCancel}
@@ -96,7 +115,7 @@ const AppointmentAdd: React.FC<AppointmentAddProps> = ({ onSubmit, onCancel, opt
             type="submit"
             bgColor="#333333"
           >
-            Add
+            Create Appointment
           </Button>
         </div>
       </form>

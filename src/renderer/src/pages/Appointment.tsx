@@ -11,7 +11,7 @@ interface AppointmentData {
   id: number;
   clientName: string;
   doctorName: string;
-  serviceName: string;
+  services: { id: string | number; label: string }[];
   date: string;
   time: string;
   status: 'Pending' | 'Confirmed' | 'Cancelled' | 'Completed';
@@ -19,9 +19,9 @@ interface AppointmentData {
 
 const Appointment = () => {
   const [appointments, setAppointments] = useState<AppointmentData[]>([
-    { id: 1, clientName: 'Abdur Rahman', doctorName: 'Dr. Mahbubur Rahman', serviceName: 'General Consultation', date: '2023-11-01', time: '10:00 AM', status: 'Confirmed' },
-    { id: 2, clientName: 'Fatima Begum', doctorName: 'Dr. Nasrin Akter', serviceName: 'Dental Checkup', date: '2023-11-01', time: '11:00 AM', status: 'Pending' },
-    { id: 3, clientName: 'Zayan Ahmed', doctorName: 'Dr. Ashraful Islam', serviceName: 'X-Ray Chest', date: '2023-11-02', time: '09:00 AM', status: 'Completed' },
+    { id: 1, clientName: 'Abdur Rahman', doctorName: 'Dr. Mahbubur Rahman', services: [{ id: 1, label: 'General Consultation' }], date: '2023-11-01', time: '10:00 AM', status: 'Confirmed' },
+    { id: 2, clientName: 'Fatima Begum', doctorName: 'Dr. Nasrin Akter', services: [{ id: 2, label: 'Dental Checkup' }], date: '2023-11-01', time: '11:00 AM', status: 'Pending' },
+    { id: 3, clientName: 'Zayan Ahmed', doctorName: 'Dr. Ashraful Islam', services: [{ id: 3, label: 'X-Ray Chest' }], date: '2023-11-02', time: '09:00 AM', status: 'Completed' },
   ]);
 
   const options = {
@@ -76,7 +76,19 @@ const Appointment = () => {
     { key: 'id', label: 'ID', headClass: 'w-16' },
     { key: 'clientName', label: 'Patient / Client', rowClass: 'font-bold' },
     { key: 'doctorName', label: 'Assigned Doctor' },
-    { key: 'serviceName', label: 'Service Type' },
+    { 
+      key: 'services', 
+      label: 'Services', 
+      render: (val: { id: string | number; label: string }[]) => (
+        <div className="flex flex-wrap gap-1">
+          {val.map((s) => (
+            <span key={s.id} className="bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded text-[10px] font-bold border border-gray-200">
+              {s.label}
+            </span>
+          ))}
+        </div>
+      )
+    },
     { key: 'date', label: 'Scheduled Date' },
     { key: 'time', label: 'Time Slot' },
     {
