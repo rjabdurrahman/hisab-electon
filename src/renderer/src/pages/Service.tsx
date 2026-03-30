@@ -52,7 +52,7 @@ const Service = () => {
     { key: 'name', label: 'Service Description', rowClass: 'font-bold' },
     { key: 'category', label: 'Category' },
     { key: 'duration', label: 'Duration' },
-    { 
+    {
       key: 'price', label: 'Service Fee', render: (val) => (
         <span className="font-bold text-[#2CAFFE]">৳{Number(val).toLocaleString()}</span>
       )
@@ -82,7 +82,7 @@ const Service = () => {
   ];
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div className="space-y-2 animate-in fade-in duration-300">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-black text-[#333333] font-exo2">Services</h1>
@@ -107,10 +107,10 @@ const Service = () => {
 
       <EditModal title="Edit Service">
         {selectedService && (
-          <ServiceEdit 
-            initialData={selectedService} 
-            onSubmit={onEditSubmit} 
-            onCancel={closeEdit} 
+          <ServiceEdit
+            initialData={selectedService}
+            onSubmit={onEditSubmit}
+            onCancel={closeEdit}
           />
         )}
       </EditModal>

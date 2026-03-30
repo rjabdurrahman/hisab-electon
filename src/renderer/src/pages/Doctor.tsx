@@ -92,7 +92,7 @@ const Doctor = () => {
   ];
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div className="space-y-2 animate-in fade-in duration-300">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-black text-[#333333] font-exo2">Doctor</h1>
@@ -117,10 +117,10 @@ const Doctor = () => {
 
       <EditModal title="Edit Doctor">
         {selectedDoctor && (
-          <DoctorEdit 
-            initialData={selectedDoctor} 
-            onSubmit={onEditSubmit} 
-            onCancel={closeEdit} 
+          <DoctorEdit
+            initialData={selectedDoctor}
+            onSubmit={onEditSubmit}
+            onCancel={closeEdit}
           />
         )}
       </EditModal>
