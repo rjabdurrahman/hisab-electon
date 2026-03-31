@@ -25,24 +25,28 @@ interface ConsultationsAddProps {
 }
 
 const ConsultationsAdd: React.FC<ConsultationsAddProps> = ({ onSubmit, onCancel, options }) => {
+  const now = new Date()
+  const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 16)
+
   const methods = useForm<ConsultationData>({
     defaultValues: {
       clientName: '',
       doctorName: '',
       age: 0,
       gender: 'Male',
-      date: new Date().toISOString().split('T')[0],
-      time: '10:00 AM',
+      date: localDate,
+      time: '10:00 AM'
     }
   })
 
   return (
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="grid grid-cols-2 gap-2">
-            <FormInput name="date" label="Date" type="date" required="Date" />
-            <FormInput name="time" label="Time" placeholder="10:00 AM" required="Time" />
+        <div className="grid grid-cols-1 gap-2">
+          <div className="w-full">
+            <FormInput name="date" label={'Date'} type="datetime-local" className="w-full" />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -59,21 +63,7 @@ const ConsultationsAdd: React.FC<ConsultationsAddProps> = ({ onSubmit, onCancel,
             options={options.doctors}
           />
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <FormInput name="age" label="Age" type="number" required="Age" />
-          <FormSelect
-            name="gender"
-            label="Gender"
-            options={[
-              { label: 'Male', value: 'Male' },
-              { label: 'Female', value: 'Female' },
-              { label: 'Other', value: 'Other' }
-            ]}
-            required="Gender"
-          />
-        </div>
-
-        <div className="pt-6 flex justify-end gap-2 border-t border-gray-100 -mx-5 px-5">
+        <div className="flex justify-end gap-2">
           <Button
             className="px-8 flex-1"
             size="large"
