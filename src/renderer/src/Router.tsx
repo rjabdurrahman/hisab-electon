@@ -1,11 +1,10 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import UserPanelLayout from "./layout/UserPanelLayout";
 import Dashboard from "./pages/Dashboard";
-import Test from "./pages/Test";
 import Doctor from "./pages/Doctor";
 import Client from "./pages/Client";
-import Service from "./pages/Investigations";
 import Investigations from "./pages/Investigations";
+import Consultations from "./pages/Consultations";
 
 const router = createBrowserRouter([
   {
@@ -21,8 +20,8 @@ const router = createBrowserRouter([
         element: <Dashboard />,
       },
       {
-        path: "test",
-        element: <Test />,
+        path: "consultations",
+        element: <Consultations />,
       },
       {
         path: "doctor",

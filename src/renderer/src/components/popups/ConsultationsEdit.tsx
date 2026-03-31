@@ -6,7 +6,7 @@ import Button from "../buttons/Button";
 import SearchSelect from "../form/SearchSelect";
 import ServiceSearchAdd from "../form/ServiceSearchAdd";
 
-interface TestData {
+interface ConsultationsData {
   id?: number;
   clientName: string;
   doctorName: string;
@@ -16,9 +16,9 @@ interface TestData {
   status: 'Pending' | 'Confirmed' | 'Cancelled' | 'Completed';
 }
 
-interface TestEditProps {
-  initialData: TestData;
-  onSubmit: (data: TestData) => void;
+interface ConsultationsEditProps {
+  initialData: ConsultationsData;
+  onSubmit: (data: ConsultationsData) => void;
   onCancel: () => void;
   options: {
     clients: { label: string; value: string }[];
@@ -27,8 +27,8 @@ interface TestEditProps {
   }
 }
 
-const TestEdit: React.FC<TestEditProps> = ({ initialData, onSubmit, onCancel, options }) => {
-  const methods = useForm<TestData>({
+const ConsultationsEdit: React.FC<ConsultationsEditProps> = ({ initialData, onSubmit, onCancel, options }) => {
+  const methods = useForm<ConsultationsData>({
     defaultValues: initialData
   });
 
@@ -115,4 +115,4 @@ const TestEdit: React.FC<TestEditProps> = ({ initialData, onSubmit, onCancel, op
   );
 };
 
-export default TestEdit;
+export default ConsultationsEdit;

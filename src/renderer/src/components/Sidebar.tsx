@@ -8,7 +8,7 @@ const Sidebar: React.FC = () => {
 
   const menuItems = [
     { id: 'dashboard', label: 'DASHBOARD', icon: '📊' },
-    { id: 'test', label: 'TESTS', icon: '🧪' },
+    { id: 'consultations', label: 'CONSULTATIONS', icon: '🧪' },
     { id: 'doctor', label: 'DOCTOR', icon: '👨‍⚕️' },
     { id: 'client', label: 'PATIENT', icon: '👥' },
     { id: 'investigations', label: 'INVESTIGATIONS', icon: '💼' },
