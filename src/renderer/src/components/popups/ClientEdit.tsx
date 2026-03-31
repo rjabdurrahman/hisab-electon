@@ -8,8 +8,6 @@ interface ClientData {
   id?: number;
   name: string;
   phone: string;
-  email: string;
-  address: string;
   gender: string;
 }
 
@@ -27,12 +25,9 @@ const ClientEdit: React.FC<ClientEditProps> = ({ initialData, onSubmit, onCancel
   return (
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <FormInput name="name" label="Full Name" required="Name is required" />
           <FormInput name="phone" label="Phone Number" required="Phone is required" />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <FormInput name="email" label="Email Address" type="email" />
           <FormSelect 
             name="gender" 
             label="Gender" 
@@ -42,9 +37,7 @@ const ClientEdit: React.FC<ClientEditProps> = ({ initialData, onSubmit, onCancel
               { label: 'Other', value: 'Other' }
             ]} 
           />
-        </div>
-        <FormInput name="address" label="Home Address" />
-        
+        </div>        
         <div className="pt-6 flex justify-end gap-2 border-t border-gray-100 -mx-5 px-5">
            <Button
             className="flex-1"
@@ -64,7 +57,7 @@ const ClientEdit: React.FC<ClientEditProps> = ({ initialData, onSubmit, onCancel
             type="submit"
             bgColor="#333333"
           >
-            Update Record
+            Update
           </Button>
         </div>
       </form>

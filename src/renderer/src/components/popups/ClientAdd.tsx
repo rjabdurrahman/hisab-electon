@@ -22,8 +22,6 @@ const ClientAdd: React.FC<ClientAddProps> = ({ onSubmit, onCancel }) => {
     defaultValues: {
       name: "",
       phone: "",
-      email: "",
-      address: "",
       gender: "Male"
     }
   });
@@ -31,12 +29,9 @@ const ClientAdd: React.FC<ClientAddProps> = ({ onSubmit, onCancel }) => {
   return (
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <FormInput name="name" label="Full Name" placeholder="e.g. John Doe" required="Name is required" />
           <FormInput name="phone" label="Phone Number" placeholder="e.g. 01700000000" required="Phone is required" />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <FormInput name="email" label="Email Address" type="email" placeholder="john@example.com" />
           <FormSelect 
             name="gender" 
             label="Gender" 
@@ -46,9 +41,7 @@ const ClientAdd: React.FC<ClientAddProps> = ({ onSubmit, onCancel }) => {
               { label: 'Other', value: 'Other' }
             ]} 
           />
-        </div>
-        <FormInput name="address" label="Home Address" placeholder="City, Area, Road" />
-        
+        </div>        
         <div className="pt-6 flex justify-end gap-2 border-t border-gray-100 -mx-5 px-5">
            <Button
             className="flex-1"

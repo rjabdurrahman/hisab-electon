@@ -11,17 +11,15 @@ interface ClientData {
   id: number;
   name: string;
   phone: string;
-  email: string;
-  address: string;
   gender: string;
   registeredAt: string;
 }
 
 const Client = () => {
   const [clients, setClients] = useState<ClientData[]>([
-    { id: 1, name: 'Abdur Rahman', phone: '01700000001', email: 'rahman@example.com', address: 'Dhaka, Bangladesh', gender: 'Male', registeredAt: '2023-10-01' },
-    { id: 2, name: 'Fatima Begum', phone: '01700000002', email: 'fatima@example.com', address: 'Chittagong, Bangladesh', gender: 'Female', registeredAt: '2023-10-05' },
-    { id: 3, name: 'Zayan Ahmed', phone: '01700000003', email: 'zayan@example.com', address: 'Sylhet, Bangladesh', gender: 'Male', registeredAt: '2023-10-10' },
+    { id: 1, name: 'Abdur Rahman', phone: '01700000001',  gender: 'Male', registeredAt: '2023-10-01' },
+    { id: 2, name: 'Fatima Begum', phone: '01700000002', gender: 'Female', registeredAt: '2023-10-05' },
+    { id: 3, name: 'Zayan Ahmed', phone: '01700000003', gender: 'Male', registeredAt: '2023-10-10' },
   ]);
 
   const [selectedClient, setSelectedClient] = useState<ClientData | null>(null);
@@ -53,9 +51,7 @@ const Client = () => {
     { key: 'id', label: 'ID', headClass: 'w-16' },
     { key: 'name', label: 'Client Name', rowClass: 'font-bold' },
     { key: 'phone', label: 'Contact' },
-    { key: 'email', label: 'Email' },
     { key: 'gender', label: 'Gender' },
-    { key: 'address', label: 'Location' },
     {
       key: 'actions', label: 'Actions', headClass: 'text-right', rowClass: 'text-right', render: (_, row) => (
         <div className="flex justify-end gap-1">
