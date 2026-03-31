@@ -4,7 +4,8 @@ import Dashboard from "./pages/Dashboard";
 import Test from "./pages/Test";
 import Doctor from "./pages/Doctor";
 import Client from "./pages/Client";
-import Service from "./pages/Service";
+import Service from "./pages/Investigations";
+import Investigations from "./pages/Investigations";
 
 const router = createBrowserRouter([
   {
@@ -32,8 +33,8 @@ const router = createBrowserRouter([
         element: <Client />,
       },
       {
-        path: "service",
-        element: <Service />,
+        path: "investigations",
+        element: <Investigations />,
       },
     ],
   },

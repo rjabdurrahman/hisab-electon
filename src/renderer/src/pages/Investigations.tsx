@@ -4,10 +4,12 @@ import { ITableColumn } from '../components/table/ITable';
 import Button from '../components/buttons/Button';
 import usePopup from '../hooks/usePopup';
 import Delete from '../components/Delete';
-import ServiceAdd from '../components/popups/ServiceAdd';
-import ServiceEdit from '../components/popups/ServiceEdit';
+import ServiceEdit from '../components/popups/InvestigationEdit';
+import InvestigationAdd from '../components/popups/InvestigationAdd';
+import { In } from 'typeorm';
+import InvestigationEdit from '../components/popups/InvestigationEdit';
 
-interface ServiceData {
+interface InvestigationData {
   id: number;
   name: string;
   category: string;
@@ -15,14 +17,14 @@ interface ServiceData {
   duration: string;
 }
 
-const Service = () => {
-  const [services, setServices] = useState<ServiceData[]>([
+const Investigations = () => {
+  const [services, setServices] = useState<InvestigationData[]>([
     { id: 1, name: 'General Consultation', category: 'Medical', price: 500, duration: '20 mins' },
     { id: 2, name: 'Dental Checkup', category: 'Dental', price: 1000, duration: '30 mins' },
     { id: 3, name: 'X-Ray Chest', category: 'Diagnostic', price: 800, duration: '15 mins' },
   ]);
 
-  const [selectedService, setSelectedService] = useState<ServiceData | null>(null);
+  const [selectedService, setSelectedService] = useState<InvestigationData | null>(null);
 
   const { openModal: openAdd, Modal: AddModal, closeModal: closeAdd } = usePopup("large");
   const { openModal: openEdit, Modal: EditModal, closeModal: closeEdit } = usePopup("large");
@@ -49,13 +51,8 @@ const Service = () => {
 
   const columns: ITableColumn[] = [
     { key: 'id', label: 'ID', headClass: 'w-16' },
-    { key: 'name', label: 'Service Description', rowClass: 'font-bold' },
-    { key: 'category', label: 'Category' },
-    { key: 'duration', label: 'Duration' },
-    {
-      key: 'price', label: 'Service Fee', render: (val) => (
-        <span className="font-bold text-[#2CAFFE]">৳{Number(val).toLocaleString()}</span>
-      )
+    { key: 'name', label: 'Name of Test ', rowClass: 'font-bold' },    {
+      key: 'price', label: 'Price', render: (_, row) => `${row.price.toLocaleString()}`
     },
     {
       key: 'actions', label: 'Actions', headClass: 'text-right', rowClass: 'text-right', render: (_, row) => (
@@ -85,7 +82,7 @@ const Service = () => {
     <div className="space-y-2 animate-in fade-in duration-300">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black text-[#333333] font-exo2">Services</h1>
+          <h1 className="text-2xl font-black text-[#333333] font-exo2">Investigations</h1>
         </div>
         <Button
           onClick={openAdd}
@@ -101,13 +98,13 @@ const Service = () => {
         <BasicTable columns={columns} data={services} />
       </div>
 
-      <AddModal title="New Service">
-        <ServiceAdd onSubmit={onAddSubmit} onCancel={closeAdd} />
+      <AddModal title="New Investigation">
+        <InvestigationAdd onSubmit={onAddSubmit} onCancel={closeAdd} />
       </AddModal>
 
-      <EditModal title="Edit Service">
+      <EditModal title="Edit Investigation">
         {selectedService && (
-          <ServiceEdit
+          <InvestigationEdit
             initialData={selectedService}
             onSubmit={onEditSubmit}
             onCancel={closeEdit}
@@ -122,4 +119,4 @@ const Service = () => {
   );
 };
 
-export default Service;
+export default Investigations;
