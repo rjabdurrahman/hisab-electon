@@ -13,17 +13,16 @@ interface DoctorData {
   specialty: string;
   phone: string;
   availability: string;
-  email?: string;
-  address?: string;
   gender?: string;
   joiningDate?: string;
+  doctorsFee?: number;
 }
 
 const Doctor = () => {
   const [doctors, setDoctors] = useState<DoctorData[]>([
-    { id: 1, name: 'Dr. Mahbubur Rahman', specialty: 'Cardiology', phone: '01712345678', availability: 'Morning', email: 'mahbub@example.com', gender: 'Male' },
-    { id: 2, name: 'Dr. Nasrin Akter', specialty: 'Pediatrics', phone: '01812345679', availability: 'Evening', email: 'nasrin@example.com', gender: 'Female' },
-    { id: 3, name: 'Dr. Ashraful Islam', specialty: 'Orthopedics', phone: '01912345680', availability: 'Afternoon', email: 'ashraf@example.com', gender: 'Male' },
+    { id: 1, name: 'Dr. Mahbubur Rahman', specialty: 'Cardiology', phone: '01712345678', availability: 'Morning', gender: 'Male', doctorsFee: 500 },
+    { id: 2, name: 'Dr. Nasrin Akter', specialty: 'Pediatrics', phone: '01812345679', availability: 'Evening', gender: 'Female', doctorsFee: 400 },
+    { id: 3, name: 'Dr. Ashraful Islam', specialty: 'Orthopedics', phone: '01912345680', availability: 'Afternoon', gender: 'Male', doctorsFee: 600 },
   ]);
 
   const [selectedDoctor, setSelectedDoctor] = useState<DoctorData | null>(null);
@@ -65,6 +64,11 @@ const Doctor = () => {
             val === 'Evening' ? 'bg-[#2CAFFE]/10 text-[#2CAFFE]' : 'bg-amber-100 text-amber-700'}`}>
           {val}
         </span>
+      )
+    },
+    {
+      key:'doctorsFee', label: "Doctor's Fee", render: (val) => (
+        <span className="font-mono">৳{val}</span>
       )
     },
     {
