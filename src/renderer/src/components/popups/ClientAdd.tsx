@@ -7,9 +7,9 @@ import Button from "../buttons/Button";
 interface ClientData {
   name: string;
   phone: string;
-  email: string;
   address: string;
   gender: string;
+  age?: number;
 }
 
 interface ClientAddProps {
@@ -22,7 +22,8 @@ const ClientAdd: React.FC<ClientAddProps> = ({ onSubmit, onCancel }) => {
     defaultValues: {
       name: "",
       phone: "",
-      gender: "Male"
+      gender: "Male",
+      age: undefined 
     }
   });
 
@@ -32,6 +33,7 @@ const ClientAdd: React.FC<ClientAddProps> = ({ onSubmit, onCancel }) => {
         <div className="grid grid-cols-1 gap-4">
           <FormInput name="name" label="Full Name" placeholder="e.g. John Doe" required="Name is required" />
           <FormInput name="phone" label="Phone Number" placeholder="e.g. 01700000000" required="Phone is required" />
+          <FormInput name="age" label="Age" type="number" placeholder="e.g. 30" />
           <FormSelect 
             name="gender" 
             label="Gender" 

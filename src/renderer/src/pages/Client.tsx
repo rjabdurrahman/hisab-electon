@@ -12,14 +12,15 @@ interface ClientData {
   name: string;
   phone: string;
   gender: string;
+  age?: number;
   registeredAt: string;
 }
 
 const Client = () => {
   const [clients, setClients] = useState<ClientData[]>([
-    { id: 1, name: 'Abdur Rahman', phone: '01700000001',  gender: 'Male', registeredAt: '2023-10-01' },
-    { id: 2, name: 'Fatima Begum', phone: '01700000002', gender: 'Female', registeredAt: '2023-10-05' },
-    { id: 3, name: 'Zayan Ahmed', phone: '01700000003', gender: 'Male', registeredAt: '2023-10-10' },
+    { id: 1, name: 'Abdur Rahman', phone: '01700000001',  gender: 'Male', age: 45, registeredAt: '2023-10-01' },
+    { id: 2, name: 'Fatima Begum', phone: '01700000002', gender: 'Female', age: 38, registeredAt: '2023-10-05' },
+    { id: 3, name: 'Zayan Ahmed', phone: '01700000003', gender: 'Male', age: 12, registeredAt: '2023-10-10' },
   ]);
 
   const [selectedClient, setSelectedClient] = useState<ClientData | null>(null);
@@ -52,6 +53,7 @@ const Client = () => {
     { key: 'name', label: 'Client Name', rowClass: 'font-bold' },
     { key: 'phone', label: 'Contact' },
     { key: 'gender', label: 'Gender' },
+    { key: 'age', label: 'Age' },
     {
       key: 'actions', label: 'Actions', headClass: 'text-right', rowClass: 'text-right', render: (_, row) => (
         <div className="flex justify-end gap-1">

@@ -9,6 +9,7 @@ interface ClientData {
   name: string;
   phone: string;
   gender: string;
+  age?: number;
 }
 
 interface ClientEditProps {
@@ -28,6 +29,7 @@ const ClientEdit: React.FC<ClientEditProps> = ({ initialData, onSubmit, onCancel
         <div className="grid grid-cols-1 gap-4">
           <FormInput name="name" label="Full Name" required="Name is required" />
           <FormInput name="phone" label="Phone Number" required="Phone is required" />
+          <FormInput name="age" label="Age" type="number" placeholder="e.g. 30" />
           <FormSelect 
             name="gender" 
             label="Gender" 
