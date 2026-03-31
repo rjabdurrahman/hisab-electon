@@ -4,7 +4,7 @@ import Dashboard from "./pages/Dashboard";
 import Doctor from "./pages/Doctor";
 import Client from "./pages/Client";
 import Investigations from "./pages/Investigations";
-import Consultations from "./pages/Consultations";
+import Consultations from "./pages/PathologyTests";
 
 const router = createBrowserRouter([
   {

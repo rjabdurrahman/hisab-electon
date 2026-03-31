@@ -4,10 +4,10 @@ import { ITableColumn } from '../components/table/ITable';
 import Button from '../components/buttons/Button';
 import usePopup from '../hooks/usePopup';
 import Delete from '../components/Delete';
-import TestAdd from '../components/popups/ConsultationsAdd';
-import TestEdit from '../components/popups/ConsultationsEdit';
+import TestAdd from '../components/popups/PathologyTestAdd';
+import TestEdit from '../components/popups/PathologyTestEdit';
 
-interface ConsultationData {
+interface pathalogyTestData {
   id: number;
   clientName: string;
   doctorName: string;
@@ -17,8 +17,8 @@ interface ConsultationData {
   status: 'Pending' | 'Confirmed' | 'Cancelled' | 'Completed';
 }
 
-const Consultations = () => {
-  const [consultations, setConsultations] = useState<ConsultationData[]>([
+const PathologyTests = () => {
+  const [pathologyTests, setPathologyTests] = useState<pathalogyTestData[]>([
     { id: 1, clientName: 'Abdur Rahman', doctorName: 'Dr. Mahbubur Rahman', services: [{ id: 1, label: 'Blood Glucose', price: 250 }], date: '2023-11-01', time: '10:00 AM', status: 'Confirmed' },
     { id: 2, clientName: 'Fatima Begum', doctorName: 'Dr. Nasrin Akter', services: [{ id: 2, label: 'ECG', price: 800 }], date: '2023-11-01', time: '11:00 AM', status: 'Pending' },
     { id: 3, clientName: 'Zayan Ahmed', doctorName: 'Dr. Ashraful Islam', services: [{ id: 3, label: 'Chest X-Ray', price: 1200 }], date: '2023-11-02', time: '09:00 AM', status: 'Completed' },
@@ -47,7 +47,7 @@ const Consultations = () => {
     ]
   };
 
-  const [selectedTest, setSelectedTest] = useState<ConsultationData | null>(null);
+  const [selectedTest, setSelectedTest] = useState<pathalogyTestData | null>(null);
 
   // Modals
   const { openModal: openAdd, Modal: AddModal, closeModal: closeAdd } = usePopup("large");
@@ -55,19 +55,19 @@ const Consultations = () => {
   const { openModal: openDelete, Modal: DeleteModal, closeModal: closeDelete } = usePopup("medium");
 
   const onAddSubmit = (data: any) => {
-    const newIdx = consultations.length + 1;
-    setConsultations([...consultations, { ...data, id: newIdx }]);
+    const newIdx = pathologyTests.length + 1;
+    setPathologyTests([...pathologyTests, { ...data, id: newIdx }]);
     closeAdd();
   };
 
   const onEditSubmit = (data: any) => {
-    setConsultations(consultations.map(a => a.id === selectedTest?.id ? { ...a, ...data } : a));
+    setPathologyTests(pathologyTests.map(a => a.id === selectedTest?.id ? { ...a, ...data } : a));
     closeEdit();
   };
 
   const handleDelete = () => {
     if (selectedTest) {
-      setConsultations(consultations.filter(a => a.id !== selectedTest.id));
+      setPathologyTests(pathologyTests.filter(a => a.id !== selectedTest.id));
       setSelectedTest(null);
       closeDelete();
     }
@@ -93,7 +93,7 @@ const Consultations = () => {
     {
        key: 'total',
        label: 'Total',
-       render: (_, row: ConsultationData) => {
+       render: (_, row: pathalogyTestData) => {
           const total = row.services.reduce((sum, s) => sum + s.price, 0);
           return <span className="font-black text-pos-primary font-mono text-sm">৳{total}</span>;
        }
@@ -137,7 +137,7 @@ const Consultations = () => {
     <div className="space-y-4 animate-in fade-in duration-300">
       <div className="flex items-center justify-between rounded-lg">
         <div>
-          <h1 className="text-2xl font-black text-[#333333] font-exo2">Consultations</h1>
+          <h1 className="text-2xl font-black text-[#333333] font-exo2">Pathology Tests</h1>
         </div>
         <Button
           onClick={openAdd}
@@ -150,7 +150,7 @@ const Consultations = () => {
       </div>
 
       <div className="bg-white border border-[#D1D5DB] rounded shadow-sm overflow-hidden">
-        <BasicTable columns={columns} data={consultations} />
+        <BasicTable columns={columns} data={pathologyTests} />
       </div>
 
       <AddModal title="Add New">
@@ -175,4 +175,4 @@ const Consultations = () => {
   );
 };
 
-export default Consultations;
+export default PathologyTests;
