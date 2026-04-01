@@ -128,6 +128,19 @@ const PathologyTests = () => {
       label: 'Ref. Doctor',
       render: (val: any) => val?.name || 'Self/None'
     },
+    { 
+      key: 'investigations', 
+      label: 'Tests & Prices', 
+      render: (val: any[]) => (
+        <div className="flex flex-wrap gap-1">
+          {val?.map((s) => (
+            <span key={s.id} className="bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-[10px] font-bold border border-blue-100 flex items-center gap-1">
+              {s.name} <span className="opacity-50 font-mono">৳{s.price}</span>
+            </span>
+          ))}
+        </div>
+      )
+    },
      {
         key: 'totalAmount',
         label: 'Sub Total',
@@ -147,19 +160,6 @@ const PathologyTests = () => {
           return <span className="font-black text-emerald-600 font-mono text-sm">৳{(total - disc).toLocaleString()}</span>
         }
      },
-    { 
-      key: 'investigations', 
-      label: 'Tests & Prices', 
-      render: (val: any[]) => (
-        <div className="flex flex-wrap gap-1">
-          {val?.map((s) => (
-            <span key={s.id} className="bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-[10px] font-bold border border-blue-100 flex items-center gap-1">
-              {s.name} <span className="opacity-50 font-mono">৳{s.price}</span>
-            </span>
-          ))}
-        </div>
-      )
-    },
     {
       key: 'actions', label: 'Actions', headClass: 'text-right', rowClass: 'text-right', render: (_, row) => (
         <div className="flex justify-end gap-1">

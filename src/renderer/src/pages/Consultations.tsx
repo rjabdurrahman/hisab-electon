@@ -145,6 +145,11 @@ const Consultations = () => {
       render: (val) => val?.name || 'N/A'
     },
     { 
+      key: 'notes', 
+      label: 'Note', 
+      render: (val: any) => <span className="text-gray-500 italic text-sm line-clamp-1">{val || 'N/A'}</span>
+    },
+    { 
       key: 'consultationFee', 
       label: 'Fee', 
       render: (val: any) => <span className="font-bold text-[#2CAFFE]">৳{Number(val || 0).toLocaleString()}</span>
@@ -162,11 +167,6 @@ const Consultations = () => {
         const disc = Number(row.discount || 0);
         return <span className="font-black text-emerald-600">৳{(fee - disc).toLocaleString()}</span>
       }
-    },
-    { 
-      key: 'notes', 
-      label: 'Note', 
-      render: (val: any) => <span className="text-gray-500 italic text-sm line-clamp-1">{val || 'N/A'}</span>
     },
     {
       key: 'actions', label: 'Actions', headClass: 'text-right', rowClass: 'text-right', render: (_, row) => (
