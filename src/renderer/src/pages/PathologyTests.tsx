@@ -103,9 +103,17 @@ const PathologyTests = () => {
       }
     }
   };
-
+  
   const columns: ITableColumn[] = [
     { key: 'id', label: 'ID', headClass: 'w-16' },
+    { 
+      key: 'date', 
+      label: 'Date & Time',
+      render: (val: any) => {
+        const d = new Date(val);
+        return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      }
+    },
     { 
       key: 'patient', 
       label: 'Patient Name', 
@@ -134,14 +142,6 @@ const PathologyTests = () => {
        key: 'totalAmount',
        label: 'Total',
        render: (val: any) => <span className="font-black text-[#2CAFFE] font-mono text-sm">৳{Number(val).toLocaleString()}</span>
-    },
-    { 
-      key: 'date', 
-      label: 'Date & Time',
-      render: (val: any) => {
-        const d = new Date(val);
-        return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-      }
     },
     {
       key: 'actions', label: 'Actions', headClass: 'text-right', rowClass: 'text-right', render: (_, row) => (
