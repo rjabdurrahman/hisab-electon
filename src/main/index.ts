@@ -148,15 +148,18 @@ app.whenReady().then(async () => {
               },
             });
 
-            const dataParam = encodeURIComponent(JSON.stringify(payload.data));
-            
-            // For HashRouter, we must use /#/print/pathology
-            const url = is.dev && process.env["ELECTRON_RENDERER_URL"]
-              ? `${process.env["ELECTRON_RENDERER_URL"]}#/print/pathology?data=${dataParam}`
-              : `file://${join(__dirname, "../renderer/index.html")}#/print/pathology?data=${dataParam}`;
+  const dataParam = encodeURIComponent(JSON.stringify(payload.data));
+  const hash = `/print/pathology?data=${dataParam}`;
 
-            console.log(`[PDF Engine] Loading URL: ${url}`);
-            printWindow.loadURL(url);
+  if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
+    const url = `${process.env["ELECTRON_RENDERER_URL"]}#${hash}`;
+    console.log(`[PDF Engine] Dev Loading URL: ${url}`);
+    printWindow.loadURL(url);
+  } else {
+    const filePath = join(__dirname, "../renderer/index.html");
+    console.log(`[PDF Engine] Prod Loading File: ${filePath} with hash: ${hash}`);
+    printWindow.loadFile(filePath, { hash });
+  }
 
             // Wait for signal OR just wait a bit (Dolil/Standard approach)
             // 1.2s is usually plenty for local React components to settle
@@ -166,7 +169,12 @@ app.whenReady().then(async () => {
                 const data = await printWindow.webContents.printToPDF({
                   printBackground: true,
                   pageSize: 'A5',
-                  marginsType: 1, // small margins
+                  margins: {
+                    top: 0.2,
+                    bottom: 0.2,
+                    left: 0.2,
+                    right: 0.2
+                  }
                 });
 
                 const tempDir = join(app.getPath("temp"), "hisab_prints");
@@ -239,11 +247,13 @@ app.whenReady().then(async () => {
           });
 
           const dataParam = encodeURIComponent(JSON.stringify(payload.data));
-          const url = is.dev && process.env["ELECTRON_RENDERER_URL"]
-            ? `${process.env["ELECTRON_RENDERER_URL"]}#/print/pathology?data=${dataParam}`
-            : `file://${join(__dirname, "../renderer/index.html")}#/print/pathology?data=${dataParam}`;
+          const hash = `/print/pathology?data=${dataParam}`;
 
-          printWindow.loadURL(url);
+          if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
+            printWindow.loadURL(`${process.env["ELECTRON_RENDERER_URL"]}#${hash}`);
+          } else {
+            printWindow.loadFile(join(__dirname, "../renderer/index.html"), { hash });
+          }
 
           // We wait for the renderer to say it's ready to print
           ipcMain.once("api-invoke-DONE_READY_TO_PRINT", () => {

@@ -1,6 +1,5 @@
 import { useSearchParams } from "react-router-dom";
 import PathologyPrintReceipt from "../components/print/PathologyPrintReceipt";
-import { useEffect } from "react";
 
 const PathologyPrintPage = () => {
     const [searchParams] = useSearchParams();

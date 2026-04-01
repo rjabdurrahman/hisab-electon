@@ -42,34 +42,37 @@ const PathologyPrintReceipt: React.FC<PathologyPrintReceiptProps> = ({ data }) =
         <div className="w-[45%] px-1 pt-0.5 text-center border-x border-black uppercase tracking-widest whitespace-nowrap overflow-hidden text-ellipsis">
           Money Receipt
         </div>
-        <div className="w-[30%] px-1 pt-0.5 text-right font-medium text-[12px] whitespace-nowrap">
+        <div className="w-[35%] px-1 pt-0.5 text-right font-medium text-[10px] whitespace-nowrap truncate uppercase">
           Print: {printDate}
         </div>
       </div>
 
       {/* Patient info box */}
       <div className="border border-black border-t-0 p-1.5 px-2 flex justify-between tracking-tight text-[13px]">
-        <div className="w-3/5 space-y-1">
+        <div className="w-[55%] space-y-1">
           <div className="flex">
-            <span className="w-20 font-bold">Patient Id</span>
-            <span className="mr-8">: <span className="font-bold">{testIdPad}</span></span>
-            <span className="font-bold">Add. NO:</span>
+            <span className="w-24 font-bold">Patient Id</span>
+            <span>: <span className="font-bold">{testIdPad}</span></span>
           </div>
           <div className="flex">
-            <span className="w-20 font-bold">Name</span>
+            <span className="w-24 font-bold">Add. NO</span>
+            <span>: </span>
+          </div>
+          <div className="flex">
+            <span className="w-24 font-bold">Name</span>
             <span>: {data.patient?.name || "N/A"}</span>
           </div>
           <div className="flex">
-            <span className="w-20 font-bold">Mobile</span>
+            <span className="w-24 font-bold">Mobile</span>
             <span>: {data.patient?.phone || "000"}</span>
           </div>
           <div className="flex">
-            <span className="w-20 font-bold whitespace-nowrap">Doctor Name</span>
-            <span className="ml-2">: {data.doctor?.name || "Self"}</span>
+            <span className="w-24 font-bold whitespace-nowrap">Doctor Name</span>
+            <span className="ml-1">: {data.doctor?.name || "Self"}</span>
           </div>
         </div>
 
-        <div className="w-2/5 space-y-1">
+        <div className="w-[45%] space-y-1">
           <div className="flex justify-between">
             <span className="w-12 font-bold">Date</span>
             <div className="flex-1">: <span className="font-bold">{dateFormatted}</span> <span className="float-right">{timeFormatted}</span></div>
@@ -117,12 +120,12 @@ const PathologyPrintReceipt: React.FC<PathologyPrintReceiptProps> = ({ data }) =
 
       {/* Footer Totals */}
       <div className="flex border border-black border-t-0 text-[13px]">
-        <div className="w-[80%] border-r border-black flex items-center justify-center p-4">
+        <div className="w-[65%] border-r border-black flex items-center justify-center p-4">
           <div className="border border-black rounded-[0.8rem] px-8 py-1.5 text-2xl font-black tracking-widest text-black">
             PAID
           </div>
         </div>
-        <div className="w-[20%]">
+        <div className="w-[35%]">
           <div className="flex justify-between border-b border-black py-0.5 px-2">
             <span>Total :</span>
             <span className="font-bold">{total.toFixed(2)}</span>
@@ -132,7 +135,7 @@ const PathologyPrintReceipt: React.FC<PathologyPrintReceiptProps> = ({ data }) =
             <span className="font-bold">{discount.toFixed(2)}</span>
           </div>
           <div className="flex justify-between border-b border-black py-0.5 px-2">
-            <span>Payble :</span>
+            <span>Payable :</span>
             <span className="font-bold">{payable.toFixed(2)}</span>
           </div>
           <div className="flex justify-between border-b border-black py-0.5 px-2">

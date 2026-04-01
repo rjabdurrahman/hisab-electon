@@ -51,6 +51,7 @@ const PathologyTestEdit: React.FC<PathologyTestEditProps> = ({ initialData, onSu
 
   const { control, setValue } = methods;
   const addedServices = useWatch({ control, name: "services" }) || [];
+  const discount = useWatch({ control, name: "discount" }) || 0;
 
   const handleAddService = (service: any) => {
     setValue("services", [...addedServices, service]);
@@ -94,6 +95,7 @@ const PathologyTestEdit: React.FC<PathologyTestEditProps> = ({ initialData, onSu
             addedServices={addedServices}
             onAdd={handleAddService}
             onRemove={handleRemoveService}
+            discount={discount}
           />
         </div>
 

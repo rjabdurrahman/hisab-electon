@@ -41,6 +41,7 @@ const PathologyTestAdd: React.FC<PathologyTestAddProps> = ({ onSubmit, onCancel,
 
   const { control, setValue } = methods;
   const addedServices = useWatch({ control, name: "services" }) || [];
+  const discount = useWatch({ control, name: "discount" }) || 0;
 
   const handleAddService = (service: any) => {
     setValue("services", [...addedServices, service]);
@@ -84,6 +85,7 @@ const PathologyTestAdd: React.FC<PathologyTestAddProps> = ({ onSubmit, onCancel,
             addedServices={addedServices}
             onAdd={handleAddService}
             onRemove={handleRemoveService}
+            discount={discount}
           />
         </div>
 
