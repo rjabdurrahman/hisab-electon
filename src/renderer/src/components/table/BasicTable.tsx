@@ -39,7 +39,7 @@ const BasicTable: React.FC<TableProps> = ({
       <th
         key={column.label + column.key}
         className={clsx(
-          "text-left px-3 py-2.5 font-semibold text-white border-b border-divider bg-[#333333] sticky top-0 z-1 text-[12px]",
+          "text-left px-3 py-3 font-bold text-white border-b border-divider bg-[#333333] sticky top-0 z-1 text-[13px]",
           column.headClass
         )}
       >
