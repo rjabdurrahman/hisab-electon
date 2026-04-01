@@ -4,31 +4,35 @@ import FormInput from "../form/FormInput";
 import FormSelect from "../form/FormSelect";
 import Button from "../buttons/Button";
 
-interface ClientData {
+interface PatientData {
   id?: number;
   name: string;
-  phone: string;
-  gender: string;
+  phone?: string;
+  gender?: 'Male' | 'Female' | 'Other';
   age?: number;
 }
 
-interface ClientEditProps {
-  initialData: ClientData;
-  onSubmit: (data: ClientData) => void;
+interface PatientAddProps {
+  onSubmit: (data: PatientData) => void | Promise<void>;
   onCancel: () => void;
 }
 
-const ClientEdit: React.FC<ClientEditProps> = ({ initialData, onSubmit, onCancel }) => {
-  const methods = useForm<ClientData>({
-    defaultValues: initialData
+const PatientAdd: React.FC<PatientAddProps> = ({ onSubmit, onCancel }) => {
+  const methods = useForm<PatientData>({
+    defaultValues: {
+      name: "",
+      phone: "",
+      gender: "Male",
+      age: undefined 
+    }
   });
 
   return (
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-4">
         <div className="grid grid-cols-1 gap-4">
-          <FormInput name="name" label="Full Name" required="Name is required" />
-          <FormInput name="phone" label="Phone Number" required="Phone is required" />
+          <FormInput name="name" label="Full Name" placeholder="e.g. John Doe" required="Name is required" />
+          <FormInput name="phone" label="Phone Number" placeholder="e.g. 01700000000" />
           <FormInput name="age" label="Age" type="number" placeholder="e.g. 30" />
           <FormSelect 
             name="gender" 
@@ -59,7 +63,7 @@ const ClientEdit: React.FC<ClientEditProps> = ({ initialData, onSubmit, onCancel
             type="submit"
             bgColor="#333333"
           >
-            Update
+            Add
           </Button>
         </div>
       </form>
@@ -67,4 +71,4 @@ const ClientEdit: React.FC<ClientEditProps> = ({ initialData, onSubmit, onCancel
   );
 };
 
-export default ClientEdit;
+export default PatientAdd;

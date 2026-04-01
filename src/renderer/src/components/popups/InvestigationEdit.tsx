@@ -11,7 +11,7 @@ interface InvestigationData {
 
 interface InvestigationEditProps {
   initialData: InvestigationData;
-  onSubmit: (data: InvestigationData) => void;
+  onSubmit: (data: InvestigationData) => void | Promise<void>;
   onCancel: () => void;
 }
 

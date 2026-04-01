@@ -7,32 +7,35 @@ import SearchSelect from "../form/SearchSelect";
 import ServiceSearchAdd from "../form/ServiceSearchAdd";
 
 interface AppointmentData {
-  clientName: string;
-  doctorName: string;
-  services: { id: string | number; label: string }[];
+  patientId: number;
+  doctorId: number;
+  services: { id: string | number; label: string; price: number }[];
   date: string;
-  time: string;
   status: 'Pending' | 'Confirmed' | 'Cancelled' | 'Completed';
 }
 
 interface AppointmentAddProps {
-  onSubmit: (data: AppointmentData) => void;
+  onSubmit: (data: AppointmentData) => void | Promise<void>;
   onCancel: () => void;
   options: {
-    clients: { label: string; value: string }[];
-    doctors: { label: string; value: string }[];
-    services: { label: string; value: string }[];
+    clients: { label: string; value: string | number }[];
+    doctors: { label: string; value: string | number }[];
+    services: { label: string; value: string | number; price: number }[];
   }
 }
 
 const AppointmentAdd: React.FC<AppointmentAddProps> = ({ onSubmit, onCancel, options }) => {
+  const now = new Date();
+  const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 16);
+
   const methods = useForm<AppointmentData>({
     defaultValues: {
-      clientName: "",
-      doctorName: "",
+      patientId: 0,
+      doctorId: 0,
       services: [],
-      date: new Date().toISOString().split('T')[0],
-      time: "10:00 AM",
+      date: localDateTime,
       status: "Pending"
     }
   });
@@ -40,7 +43,7 @@ const AppointmentAdd: React.FC<AppointmentAddProps> = ({ onSubmit, onCancel, opt
   const { control, setValue } = methods;
   const addedServices = useWatch({ control, name: "services" }) || [];
 
-  const handleAddService = (service: { id: string | number; label: string }) => {
+  const handleAddService = (service: { id: string | number; label: string; price: number }) => {
     setValue("services", [...addedServices, service]);
   };
 
@@ -53,14 +56,14 @@ const AppointmentAdd: React.FC<AppointmentAddProps> = ({ onSubmit, onCancel, opt
       <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
           <SearchSelect
-            name="clientName" 
-            label="Select Client" 
-            placeholder="Search Client..." 
+            name="patientId" 
+            label="Select Patient" 
+            placeholder="Search Patient..." 
             options={options.clients} 
-            required="Client is required"
+            required="Patient is required"
           />
           <SearchSelect 
-            name="doctorName" 
+            name="doctorId" 
             label="Assign Doctor" 
             placeholder="Select Practitioner..." 
             options={options.doctors} 
@@ -81,10 +84,7 @@ const AppointmentAdd: React.FC<AppointmentAddProps> = ({ onSubmit, onCancel, opt
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div className="grid grid-cols-2 gap-2">
-             <FormInput name="date" label="Date" type="date" required="Date" />
-             <FormInput name="time" label="Time" placeholder="10:00 AM" required="Time" />
-          </div>
+          <FormInput name="date" label="Date & Time" type="datetime-local" required="Date and Time is required" />
           <FormSelect
             name="status" 
             label="Initial Status" 

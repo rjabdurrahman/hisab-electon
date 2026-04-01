@@ -23,7 +23,7 @@ const FormSelect: React.FC<FormSelectProps> = ({
   placeholder,
   required 
 }) => {
-  const { register, formState: { errors }, watch } = useFormContext();
+  const { register, formState: { errors } } = useFormContext();
 
   return (
     <div className="w-full">
@@ -65,9 +65,9 @@ const FormSelect: React.FC<FormSelectProps> = ({
           </svg>
         </div>
       </div>
-      {errors[name] && (
+      {errors && errors[name] && (
         <p className="text-red-500 text-sm mt-1 ml-1 text-left">
-          {errors[name]?.message as string}
+          {(errors[name] as any)?.message}
         </p>
       )}
     </div>

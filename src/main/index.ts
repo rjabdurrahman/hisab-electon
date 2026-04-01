@@ -4,38 +4,39 @@ import { join } from "path";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import icon from "../../resources/icon.png?asset";
 import { AppDataSource } from "./database/data-source";
-import { InventoryService } from "./services/inventory.service";
-import { Category } from "./database/entities/Category";
-import { Product } from "./database/entities/Product";
+import { ConsultationService } from "./services/consultation.service";
+import { PatientService } from "./services/patient.service";
+import { DoctorService } from "./services/doctor.service";
+import { InvestigationService } from "./services/investigation.service";
+import { PathologyService } from "./services/pathology.service";
+import { Doctor } from "./database/entities/Doctor";
+import { Investigation } from "./database/entities/Investigation";
 
 async function initializeDatabase() {
   try {
     await AppDataSource.initialize();
     console.log("Database initialized successfully!");
     
-    // Seed sample inventory data if empty
-    const categoryRepo = AppDataSource.getRepository(Category);
-    if ((await categoryRepo.count()) === 0) {
-      const category = new Category();
-      category.name = "Electronics";
-      category.description = "Primary Gadgets";
-      await categoryRepo.save(category);
+    // Seed initial data if empty
+    const doctorRepo = AppDataSource.getRepository(Doctor);
+    if ((await doctorRepo.count()) === 0) {
+      await doctorRepo.save([
+        { name: "Dr. Mahbubur Rahman", specialization: "Cardiology", phone: "01712345678", consultationFee: 500 },
+        { name: "Dr. Nasrin Akter", specialization: "Pediatrics", phone: "01812345679", consultationFee: 400 },
+        { name: "Dr. Ashraful Islam", specialization: "Orthopedics", phone: "01912345680", consultationFee: 600 },
+      ]);
+      console.log("Seeded basic doctors.");
+    }
 
-      const productRepo = AppDataSource.getRepository(Product);
-      const initialProducts = [
-        { name: "MacBook Pro", price: 1999.00, stock: 5, category },
-        { name: "iPhone 15", price: 999.00, stock: 12, category },
-      ];
-
-      for (const p of initialProducts) {
-        const product = new Product();
-        product.name = p.name;
-        product.price = p.price;
-        product.stock = p.stock;
-        product.category = p.category;
-        await productRepo.save(product);
-      }
-      console.log("Seeded basic inventory data.");
+    const investigationRepo = AppDataSource.getRepository(Investigation);
+    if ((await investigationRepo.count()) === 0) {
+      await investigationRepo.save([
+        { name: "CBC", price: 350, category: "Pathology" },
+        { name: "Blood Glucose (RBS)", price: 100, category: "Pathology" },
+        { name: "ECG", price: 400, category: "Diagnostic" },
+        { name: "X-Ray Chest", price: 500, category: "Radiology" },
+      ]);
+      console.log("Seeded basic investigations.");
     }
   } catch (error) {
     console.error("Database initialization failed:", error);
@@ -82,18 +83,57 @@ app.whenReady().then(async () => {
 
   await initializeDatabase();
 
-  // Unified IPC Gateway
   ipcMain.handle("api-invoke", async (_event, action: string, payload: any) => {
     try {
       switch (action) {
-        case "CATEGORY:LIST":
-          return await InventoryService.getAllCategories();
-        case "CATEGORY:CREATE":
-          return await InventoryService.createCategory(payload.name, payload.description);
-        case "INVENTORY:FETCH":
-          return await InventoryService.getCategoryWithProducts(payload.categoryId);
-        case "INVENTORY:ADD_PRODUCT":
-          return await InventoryService.addProduct(payload.categoryId, payload.product);
+        // Patient Actions
+        case "PATIENT:LIST":
+          return await PatientService.getAll();
+        case "PATIENT:CREATE":
+          return await PatientService.create(payload);
+        case "PATIENT:UPDATE":
+          return await PatientService.update(payload.id, payload.data);
+        case "PATIENT:DELETE":
+          return await PatientService.delete(payload.id);
+
+        // Doctor Actions
+        case "DOCTOR:LIST":
+          return await DoctorService.getAll();
+        case "DOCTOR:CREATE":
+          return await DoctorService.create(payload);
+        case "DOCTOR:UPDATE":
+          return await DoctorService.update(payload.id, payload.data);
+        case "DOCTOR:DELETE":
+          return await DoctorService.delete(payload.id);
+
+        // Investigation Actions
+        case "INVESTIGATION:LIST":
+          return await InvestigationService.getAll();
+        case "INVESTIGATION:CREATE":
+          return await InvestigationService.create(payload);
+        case "INVESTIGATION:UPDATE":
+          return await InvestigationService.update(payload.id, payload.data);
+        case "INVESTIGATION:DELETE":
+          return await InvestigationService.delete(payload.id);
+
+        // Pathology Test Actions
+        case "PATHOLOGY:LIST":
+          return await PathologyService.getAll();
+        case "PATHOLOGY:CREATE":
+          return await PathologyService.create(payload);
+        case "PATHOLOGY:DELETE":
+          return await PathologyService.delete(payload.id);
+
+        // Consultation Actions
+        case "CONSULTATION:LIST":
+          return await ConsultationService.getAll();
+        case "CONSULTATION:CREATE":
+          return await ConsultationService.create(payload);
+        case "CONSULTATION:UPDATE":
+          return await ConsultationService.update(payload.id, payload.data);
+        case "CONSULTATION:DELETE":
+          return await ConsultationService.delete(payload.id);
+
         default:
           throw new Error(`Unknown action: ${action}`);
       }

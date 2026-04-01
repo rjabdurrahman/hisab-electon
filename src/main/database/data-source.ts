@@ -2,8 +2,12 @@ import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { app } from "electron";
 import * as path from "path";
-import { Category } from "./entities/Category";
-import { Product } from "./entities/Product";
+import { Patient } from "./entities/Patient";
+import { Doctor } from "./entities/Doctor";
+import { Investigation } from "./entities/Investigation";
+import { Consultation } from "./entities/Consultation";
+import { PathologyTest } from "./entities/PathologyTest";
+import { PathologyTestInvestigation } from "./entities/PathologyTestInvestigation";
 
 let dbPath = "database.sqlite";
 if (app) {
@@ -16,7 +20,14 @@ export const AppDataSource = new DataSource({
   database: dbPath,
   synchronize: true, // Only for dev, use migrations in production
   logging: false,
-  entities: [Category, Product],
+  entities: [
+    Patient,
+    Doctor,
+    Investigation,
+    Consultation,
+    PathologyTest,
+    PathologyTestInvestigation,
+  ],
   subscribers: [],
   migrations: [],
 });

@@ -26,19 +26,22 @@
   --color-divider: var(--border-color);
 }
 
+/* Tailwind v4: class-based dark mode toggle (official syntax) */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Light theme (default) */
 :root {
-  --bg-canvas: #f4f4f4; /* pos-v2 secondary bg */
+  --bg-canvas: #ffffff;
   --bg-surface: #ffffff;
-  --bg-panel: #fcfcfc;
-  --text-primary: #333333; /* pos-v2 primary text */
+  --bg-panel: #f9fafb;
+  --text-primary: #333333;
   --text-secondary: #475569;
   --text-muted: #94a3b8;
   --border-color: #d1d5db;
   --overlay: rgba(0, 0, 0, 0.4);
 }
 
+/* Dark theme (activated by .dark class on <html>) */
 .dark {
   --bg-canvas: #111111;
   --bg-surface: #1e1e1e;

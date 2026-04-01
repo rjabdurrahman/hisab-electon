@@ -4,101 +4,90 @@ import { ITableColumn } from '../components/table/ITable';
 import Button from '../components/buttons/Button';
 import usePopup from '../hooks/usePopup';
 import Delete from '../components/Delete';
-import InvestigationAdd from '../components/popups/InvestigationAdd';
-import InvestigationEdit from '../components/popups/InvestigationEdit';
+import PatientAdd from '../components/popups/PatientAdd';
+import PatientEdit from '../components/popups/PatientEdit';
 
-interface InvestigationData {
+interface PatientData {
   id: number;
   name: string;
-  category: string;
-  price: number;
-  isActive: boolean;
+  phone?: string;
+  gender?: 'Male' | 'Female' | 'Other';
+  age?: number;
   createdAt: string;
 }
 
-const Investigations = () => {
-  const [investigations, setInvestigations] = useState<InvestigationData[]>([]);
-  const [selectedService, setSelectedService] = useState<InvestigationData | null>(null);
+const Patient = () => {
+  const [patients, setPatients] = useState<PatientData[]>([]);
+  const [selectedPatient, setSelectedPatient] = useState<PatientData | null>(null);
   const [loading, setLoading] = useState(true);
 
   const { openModal: openAdd, Modal: AddModal, closeModal: closeAdd } = usePopup("large");
   const { openModal: openEdit, Modal: EditModal, closeModal: closeEdit } = usePopup("large");
   const { openModal: openDelete, Modal: DeleteModal, closeModal: closeDelete } = usePopup("medium");
 
-  const fetchInvestigations = async () => {
+  const fetchPatients = async () => {
     setLoading(true);
     try {
-      const data = await window.api.invoke('INVESTIGATION:LIST');
-      setInvestigations(data);
+      const data = await window.api.invoke('PATIENT:LIST');
+      setPatients(data);
     } catch (error) {
-      console.error("Failed to fetch investigations:", error);
+      console.error("Failed to fetch patients:", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchInvestigations();
+    fetchPatients();
   }, []);
 
   const onAddSubmit = async (data: any) => {
     try {
-      await window.api.invoke('INVESTIGATION:CREATE', {
-        ...data,
-        price: Number(data.price),
-        isActive: true
-      });
-      fetchInvestigations();
+      await window.api.invoke('PATIENT:CREATE', data);
+      fetchPatients();
       closeAdd();
     } catch (error) {
-      console.error("Failed to add investigation:", error);
+      console.error("Failed to add patient:", error);
     }
   };
 
   const onEditSubmit = async (data: any) => {
-    if (!selectedService) return;
+    if (!selectedPatient) return;
     try {
-      await window.api.invoke('INVESTIGATION:UPDATE', {
-        id: selectedService.id,
-        data: {
-          ...data,
-          price: Number(data.price)
-        }
-      });
-      fetchInvestigations();
+      await window.api.invoke('PATIENT:UPDATE', { id: selectedPatient.id, data });
+      fetchPatients();
       closeEdit();
     } catch (error) {
-      console.error("Failed to update investigation:", error);
+      console.error("Failed to update patient:", error);
     }
   };
 
   const handleDelete = async () => {
-    if (selectedService) {
+    if (selectedPatient) {
       try {
-        await window.api.invoke('INVESTIGATION:DELETE', { id: selectedService.id });
-        fetchInvestigations();
-        setSelectedService(null);
+        await window.api.invoke('PATIENT:DELETE', { id: selectedPatient.id });
+        fetchPatients();
+        setSelectedPatient(null);
         closeDelete();
       } catch (error) {
-        console.error("Failed to delete investigation:", error);
+        console.error("Failed to delete patient:", error);
       }
     }
   };
 
   const columns: ITableColumn[] = [
     { key: 'id', label: 'ID', headClass: 'w-16' },
-    { key: 'name', label: 'Name of Test ', rowClass: 'font-bold' },
-    { key: 'category', label: 'Category' },
-    {
-      key: 'price', label: 'Price (৳)', render: (val) => `${Number(val).toLocaleString()}`
-    },
+    { key: 'name', label: 'Patient Name', rowClass: 'font-bold' },
+    { key: 'phone', label: 'Contact' },
+    { key: 'gender', label: 'Gender' },
+    { key: 'age', label: 'Age' },
     {
       key: 'actions', label: 'Actions', headClass: 'text-right', rowClass: 'text-right', render: (_, row) => (
         <div className="flex justify-end gap-1">
           <Button
             variant="icon"
             size="extraSmall"
-            onClick={() => { setSelectedService(row); openEdit(); }}
+            onClick={() => { setSelectedPatient(row); openEdit(); }}
             textColor="#333333"
           >
             ✏️
@@ -106,7 +95,7 @@ const Investigations = () => {
           <Button
             variant="icon"
             size="extraSmall"
-            onClick={() => { setSelectedService(row); openDelete(); }}
+            onClick={() => { setSelectedPatient(row); openDelete(); }}
             textColor="#ef4444"
           >
             🗑️
@@ -120,7 +109,7 @@ const Investigations = () => {
     <div className="space-y-2 animate-in fade-in duration-300">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black text-[#333333] font-exo2">Investigations</h1>
+          <h1 className="text-2xl font-black text-[#333333] font-exo2">Patients</h1>
         </div>
         <Button
           onClick={openAdd}
@@ -134,20 +123,20 @@ const Investigations = () => {
 
       <div className="bg-white border border-[#D1D5DB] rounded shadow-sm overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-500 font-medium">Loading investigations...</div>
+          <div className="p-8 text-center text-gray-500 font-medium">Loading patients...</div>
         ) : (
-          <BasicTable columns={columns} data={investigations} />
+          <BasicTable columns={columns} data={patients} />
         )}
       </div>
 
-      <AddModal title="New Investigation">
-        <InvestigationAdd onSubmit={onAddSubmit} onCancel={closeAdd} />
+      <AddModal title="New Patient">
+        <PatientAdd onSubmit={onAddSubmit} onCancel={closeAdd} />
       </AddModal>
 
-      <EditModal title="Edit Investigation">
-        {selectedService && (
-          <InvestigationEdit
-            initialData={selectedService}
+      <EditModal title="Edit Patient">
+        {selectedPatient && (
+          <PatientEdit
+            initialData={selectedPatient}
             onSubmit={onEditSubmit}
             onCancel={closeEdit}
           />
@@ -161,4 +150,4 @@ const Investigations = () => {
   );
 };
 
-export default Investigations;
+export default Patient;

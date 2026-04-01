@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BasicTable from '../components/table/BasicTable';
 import { ITableColumn } from '../components/table/ITable';
 import Button from '../components/buttons/Button';
@@ -10,64 +10,92 @@ import DoctorEdit from '../components/popups/DoctorEdit';
 interface DoctorData {
   id: number;
   name: string;
-  specialty: string;
+  specialization: string;
   phone: string;
-  availability: string;
-  gender?: string;
-  joiningDate?: string;
-  doctorsFee?: number;
+  consultationFee: number;
+  createdAt: string;
 }
 
 const Doctor = () => {
-  const [doctors, setDoctors] = useState<DoctorData[]>([
-    { id: 1, name: 'Dr. Mahbubur Rahman', specialty: 'Cardiology', phone: '01712345678', availability: 'Morning', gender: 'Male', doctorsFee: 500 },
-    { id: 2, name: 'Dr. Nasrin Akter', specialty: 'Pediatrics', phone: '01812345679', availability: 'Evening', gender: 'Female', doctorsFee: 400 },
-    { id: 3, name: 'Dr. Ashraful Islam', specialty: 'Orthopedics', phone: '01912345680', availability: 'Afternoon', gender: 'Male', doctorsFee: 600 },
-  ]);
-
+  const [doctors, setDoctors] = useState<DoctorData[]>([]);
   const [selectedDoctor, setSelectedDoctor] = useState<DoctorData | null>(null);
+  const [loading, setLoading] = useState(true);
 
   // Modals
   const { openModal: openAdd, Modal: AddModal, closeModal: closeAdd } = usePopup("large");
   const { openModal: openEdit, Modal: EditModal, closeModal: closeEdit } = usePopup("large");
   const { openModal: openDelete, Modal: DeleteModal, closeModal: closeDelete } = usePopup("medium");
 
-  const onAddSubmit = (data: any) => {
-    const newDoc = { ...data, id: doctors.length + 1 };
-    setDoctors([...doctors, newDoc]);
-    closeAdd();
+  const fetchDoctors = async () => {
+    setLoading(true);
+    try {
+      const data = await window.api.invoke('DOCTOR:LIST');
+      setDoctors(data);
+    } catch (error) {
+      console.error("Failed to fetch doctors:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const onEditSubmit = (data: any) => {
-    setDoctors(doctors.map(d => d.id === selectedDoctor?.id ? { ...d, ...data } : d));
-    closeEdit();
+  useEffect(() => {
+    fetchDoctors();
+  }, []);
+
+  const onAddSubmit = async (data: any) => {
+    try {
+      await window.api.invoke('DOCTOR:CREATE', {
+        name: data.name,
+        specialization: data.specialty || data.specialization,
+        phone: data.phone,
+        consultationFee: Number(data.doctorsFee || data.consultationFee)
+      });
+      fetchDoctors();
+      closeAdd();
+    } catch (error) {
+      console.error("Failed to add doctor:", error);
+    }
   };
 
-  const handleDelete = () => {
+  const onEditSubmit = async (data: any) => {
+    if (!selectedDoctor) return;
+    try {
+      await window.api.invoke('DOCTOR:UPDATE', {
+        id: selectedDoctor.id,
+        data: {
+          name: data.name,
+          specialization: data.specialty || data.specialization,
+          phone: data.phone,
+          consultationFee: Number(data.doctorsFee || data.consultationFee)
+        }
+      });
+      fetchDoctors();
+      closeEdit();
+    } catch (error) {
+      console.error("Failed to update doctor:", error);
+    }
+  };
+
+  const handleDelete = async () => {
     if (selectedDoctor) {
-      setDoctors(doctors.filter(d => d.id !== selectedDoctor.id));
-      setSelectedDoctor(null);
-      closeDelete();
+      try {
+        await window.api.invoke('DOCTOR:DELETE', { id: selectedDoctor.id });
+        fetchDoctors();
+        setSelectedDoctor(null);
+        closeDelete();
+      } catch (error) {
+        console.error("Failed to delete doctor:", error);
+      }
     }
   };
 
   const columns: ITableColumn[] = [
     { key: 'id', label: 'ID', headClass: 'w-16' },
     { key: 'name', label: 'Doctor Name', rowClass: 'font-bold' },
-    { key: 'specialty', label: 'Specialty' },
+    { key: 'specialization', label: 'Specialty' },
     { key: 'phone', label: 'Contact Number' },
-    { key: 'gender', label: 'Gender' },
     {
-      key: 'availability', label: 'Availability', render: (val) => (
-        <span className={`px-2 py-0.5 rounded text-[10px] font-black tracking-wider 
-        ${val === 'Morning' ? 'bg-[#2563EB]/10 text-[#2563EB]' :
-            val === 'Evening' ? 'bg-[#2CAFFE]/10 text-[#2CAFFE]' : 'bg-amber-100 text-amber-700'}`}>
-          {val}
-        </span>
-      )
-    },
-    {
-      key:'doctorsFee', label: "Doctor's Fee", render: (val) => (
+      key: 'consultationFee', label: "Doctor's Fee", render: (val) => (
         <span className="font-mono">৳{val}</span>
       )
     },
@@ -112,7 +140,11 @@ const Doctor = () => {
       </div>
 
       <div className="bg-white border border-[#D1D5DB] rounded shadow-sm overflow-hidden">
-        <BasicTable columns={columns} data={doctors} />
+        {loading ? (
+          <div className="p-8 text-center text-gray-500 font-medium">Loading doctors...</div>
+        ) : (
+          <BasicTable columns={columns} data={doctors} />
+        )}
       </div>
 
       <AddModal title="New Doctor">

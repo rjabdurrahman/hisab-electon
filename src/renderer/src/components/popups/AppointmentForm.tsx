@@ -10,7 +10,6 @@ interface AppointmentData {
   doctorName: string;
   serviceName: string;
   date: string;
-  time: string;
   status: 'Pending' | 'Confirmed' | 'Cancelled' | 'Completed';
 }
 
@@ -26,13 +25,15 @@ interface AppointmentFormProps {
 }
 
 const AppointmentForm: React.FC<AppointmentFormProps> = ({ initialData, onSubmit, onCancel, options }) => {
+  const now = new Date();
+  const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+
   const methods = useForm<AppointmentData>({
     defaultValues: initialData || {
       clientName: "",
       doctorName: "",
       serviceName: "",
-      date: new Date().toISOString().split('T')[0],
-      time: "10:00 AM",
+      date: localDateTime,
       status: "Pending"
     }
   });
@@ -64,10 +65,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ initialData, onSubmit
             options={options.services}
             required="Service is required"
           />
-          <div className="grid grid-cols-2 gap-2">
-            <FormInput name="date" label="Date" type="date" required="Date" />
-            <FormInput name="time" label="Time" placeholder="10:00 AM" required="Time" />
-          </div>
+          <FormInput name="date" label="Date & Time" type="datetime-local" required="Date & Time is required" />
         </div>
         <FormSelect
           name="status"

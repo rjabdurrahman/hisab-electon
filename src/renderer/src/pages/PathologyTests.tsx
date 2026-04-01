@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BasicTable from '../components/table/BasicTable';
 import { ITableColumn } from '../components/table/ITable';
 import Button from '../components/buttons/Button';
@@ -7,107 +7,141 @@ import Delete from '../components/Delete';
 import TestAdd from '../components/popups/PathologyTestAdd';
 import TestEdit from '../components/popups/PathologyTestEdit';
 
-interface pathalogyTestData {
+interface PathologyTestData {
   id: number;
-  clientName: string;
-  doctorName: string;
-  services: { id: string | number; label: string; price: number }[];
   date: string;
-  time: string;
-  status: 'Pending' | 'Confirmed' | 'Cancelled' | 'Completed';
+  totalAmount: number;
+  patient: { id: number; name: string };
+  doctor?: { id: number; name: string };
+  investigations: { id: number; name: string; price: number }[];
+  createdAt: string;
 }
 
 const PathologyTests = () => {
-  const [pathologyTests, setPathologyTests] = useState<pathalogyTestData[]>([
-    { id: 1, clientName: 'Abdur Rahman', doctorName: 'Dr. Mahbubur Rahman', services: [{ id: 1, label: 'Blood Glucose', price: 250 }], date: '2023-11-01', time: '10:00 AM', status: 'Confirmed' },
-    { id: 2, clientName: 'Fatima Begum', doctorName: 'Dr. Nasrin Akter', services: [{ id: 2, label: 'ECG', price: 800 }], date: '2023-11-01', time: '11:00 AM', status: 'Pending' },
-    { id: 3, clientName: 'Zayan Ahmed', doctorName: 'Dr. Ashraful Islam', services: [{ id: 3, label: 'Chest X-Ray', price: 1200 }], date: '2023-11-02', time: '09:00 AM', status: 'Completed' },
-  ]);
+  const [pathologyTests, setPathologyTests] = useState<PathologyTestData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [options, setOptions] = useState({
+    clients: [] as any[],
+    doctors: [] as any[],
+    services: [] as any[]
+  });
 
-  const options = {
-    clients: [
-      { label: 'Abdur Rahman', value: 'Abdur Rahman' },
-      { label: 'Fatima Begum', value: 'Fatima Begum' },
-      { label: 'Zayan Ahmed', value: 'Zayan Ahmed' },
-      { label: 'Karin Sultana', value: 'Karin Sultana' }
-    ],
-    doctors: [
-      { label: 'Dr. Mahbubur Rahman', value: 'Dr. Mahbubur Rahman' },
-      { label: 'Dr. Nasrin Akter', value: 'Dr. Nasrin Akter' },
-      { label: 'Dr. Ashraful Islam', value: 'Dr. Ashraful Islam' },
-      { label: 'Dr. S.M. Ali', value: 'Dr. S.M. Ali' }
-    ],
-    services: [
-      { label: 'Blood Glucose', value: 'Blood Glucose', price: 250 },
-      { label: 'CBC', value: 'CBC', price: 600 },
-      { label: 'Lipid Profile', value: 'Lipid Profile', price: 1200 },
-      { label: 'Chest X-Ray', value: 'Chest X-Ray', price: 1200 },
-      { label: 'ECG', value: 'ECG', price: 800 },
-      { label: 'Ultrasonography', value: 'Ultrasonography', price: 1500 }
-    ]
-  };
-
-  const [selectedTest, setSelectedTest] = useState<pathalogyTestData | null>(null);
+  const [selectedTest, setSelectedTest] = useState<PathologyTestData | null>(null);
 
   // Modals
   const { openModal: openAdd, Modal: AddModal, closeModal: closeAdd } = usePopup("large");
   const { openModal: openEdit, Modal: EditModal, closeModal: closeEdit } = usePopup("large");
   const { openModal: openDelete, Modal: DeleteModal, closeModal: closeDelete } = usePopup("medium");
 
-  const onAddSubmit = (data: any) => {
-    const newIdx = pathologyTests.length + 1;
-    setPathologyTests([...pathologyTests, { ...data, id: newIdx }]);
-    closeAdd();
+  const fetchAllData = async () => {
+    setLoading(true);
+    try {
+      const [tests, patients, doctors, investigations] = await Promise.all([
+        window.api.invoke('PATHOLOGY:LIST'),
+        window.api.invoke('PATIENT:LIST'),
+        window.api.invoke('DOCTOR:LIST'),
+        window.api.invoke('INVESTIGATION:LIST')
+      ]);
+
+      setPathologyTests(tests || []);
+      setOptions({
+        clients: (patients || []).map((p: any) => ({ label: p.name, value: p.id })),
+        doctors: (doctors || []).map((d: any) => ({ label: d.name, value: d.id })),
+        services: (investigations || []).map((i: any) => ({ label: i.name, value: i.id, price: i.price }))
+      });
+    } catch (error) {
+      console.error("Failed to fetch pathology data:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const onEditSubmit = (data: any) => {
-    setPathologyTests(pathologyTests.map(a => a.id === selectedTest?.id ? { ...a, ...data } : a));
-    closeEdit();
+  useEffect(() => {
+    fetchAllData();
+  }, []);
+
+  const onAddSubmit = async (data: any) => {
+    try {
+      await window.api.invoke('PATHOLOGY:CREATE', {
+        date: data.date,
+        patientId: Number(data.patientId),
+        doctorId: data.doctorId ? Number(data.doctorId) : undefined,
+        testIds: data.services?.map((s: any) => Number(s.id)) || []
+      });
+      fetchAllData();
+      closeAdd();
+    } catch (error) {
+      console.error("Failed to create pathology test:", error);
+    }
   };
 
-  const handleDelete = () => {
+  const onEditSubmit = async (data: any) => {
+    try {
+      await window.api.invoke('PATHOLOGY:UPDATE', {
+        id: selectedTest?.id,
+        date: data.date,
+        patientId: Number(data.patientId),
+        doctorId: data.doctorId ? Number(data.doctorId) : undefined,
+        testIds: data.services?.map((s: any) => Number(s.id)) || []
+      });
+      fetchAllData();
+      closeEdit();
+    } catch (error) {
+      console.error("Failed to update pathology test:", error);
+    }
+  };
+
+  const handleDelete = async () => {
     if (selectedTest) {
-      setPathologyTests(pathologyTests.filter(a => a.id !== selectedTest.id));
-      setSelectedTest(null);
-      closeDelete();
+      try {
+        await window.api.invoke('PATHOLOGY:DELETE', { id: selectedTest.id });
+        fetchAllData();
+        setSelectedTest(null);
+        closeDelete();
+      } catch (error) {
+        console.error("Failed to delete pathology test:", error);
+      }
     }
   };
 
   const columns: ITableColumn[] = [
     { key: 'id', label: 'ID', headClass: 'w-16' },
-    { key: 'clientName', label: 'Patient Name', rowClass: 'font-bold' },
-    { key: 'doctorName', label: 'Doctor' },
     { 
-      key: 'services', 
+      key: 'patient', 
+      label: 'Patient Name', 
+      rowClass: 'font-bold',
+      render: (val: any) => val?.name || 'N/A'
+    },
+    { 
+      key: 'doctor', 
+      label: 'Ref. Doctor',
+      render: (val: any) => val?.name || 'Self/None'
+    },
+    { 
+      key: 'investigations', 
       label: 'Tests & Prices', 
-      render: (val: { id: string | number; label: string; price: number }[]) => (
+      render: (val: any[]) => (
         <div className="flex flex-wrap gap-1">
-          {val.map((s) => (
+          {val?.map((s) => (
             <span key={s.id} className="bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-[10px] font-bold border border-blue-100 flex items-center gap-1">
-              {s.label} <span className="opacity-50 font-mono">৳{s.price}</span>
+              {s.name} <span className="opacity-50 font-mono">৳{s.price}</span>
             </span>
           ))}
         </div>
       )
     },
     {
-       key: 'total',
+       key: 'totalAmount',
        label: 'Total',
-       render: (_, row: pathalogyTestData) => {
-          const total = row.services.reduce((sum, s) => sum + s.price, 0);
-          return <span className="font-black text-pos-primary font-mono text-sm">৳{total}</span>;
-       }
+       render: (val: any) => <span className="font-black text-[#2CAFFE] font-mono text-sm">৳{Number(val).toLocaleString()}</span>
     },
-    { key: 'date', label: 'Date' },
-    {
-      key: 'status', label: 'Status', render: (val) => (
-        <span className={`px-2 py-0.5 rounded text-[10px] font-black tracking-wider 
-        ${val === 'Confirmed' ? 'bg-emerald-100 text-emerald-700' :
-            val === 'Pending' ? 'bg-amber-100 text-amber-700' :
-              val === 'Cancelled' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
-          {val}
-        </span>
-      )
+    { 
+      key: 'date', 
+      label: 'Date & Time',
+      render: (val: any) => {
+        const d = new Date(val);
+        return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      }
     },
     {
       key: 'actions', label: 'Actions', headClass: 'text-right', rowClass: 'text-right', render: (_, row) => (
@@ -150,7 +184,11 @@ const PathologyTests = () => {
       </div>
 
       <div className="bg-white border border-[#D1D5DB] rounded shadow-sm overflow-hidden">
-        <BasicTable columns={columns} data={pathologyTests} />
+        {loading ? (
+          <div className="p-8 text-center text-gray-500 font-medium">Loading pathology tests...</div>
+        ) : (
+          <BasicTable columns={columns} data={pathologyTests} />
+        )}
       </div>
 
       <AddModal title="Add New">

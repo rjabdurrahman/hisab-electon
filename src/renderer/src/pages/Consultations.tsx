@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BasicTable from '../components/table/BasicTable';
 import { ITableColumn } from '../components/table/ITable';
 import Button from '../components/buttons/Button';
@@ -7,48 +7,25 @@ import Delete from '../components/Delete';
 import ConsultationsEdit from '@renderer/components/popups/ConsultationsEdit';
 import ConsultationsAdd from '@renderer/components/popups/ConsultationsAdd';
 
-
 interface ConsultationData {
   id: number;
-  clientName: string;
-  doctorName: string;
-  age: number;
-  gender: 'Male' | 'Female' | 'Other';
-  services: { id: string | number; label: string; price: number }[];
   date: string;
-  time: string;
-  status: 'Pending' | 'Confirmed' | 'Cancelled' | 'Completed';
+  patientId: number;
+  doctorId: number;
+  patient: { id: number; name: string; age?: number; gender?: string };
+  doctor: { id: number; name: string };
+  consultationFee?: number;
+  notes?: string;
+  createdAt: string;
 }
 
 const Consultations = () => {
-  const [consultations, setConsultations] = useState<ConsultationData[]>([
-    { id: 1, clientName: 'Abdur Rahman', doctorName: 'Dr. Mahbubur Rahman', age: 45, gender: 'Male', services: [{ id: 1, label: 'Blood Glucose', price: 250 }], date: '2023-11-01', time: '10:00 AM', status: 'Confirmed' },
-    { id: 2, clientName: 'Fatima Begum', doctorName: 'Dr. Nasrin Akter', age: 38, gender: 'Female', services: [{ id: 2, label: 'ECG', price: 800 }], date: '2023-11-01', time: '11:00 AM', status: 'Pending' },
-    { id: 3, clientName: 'Zayan Ahmed', doctorName: 'Dr. Ashraful Islam', age: 12, gender: 'Male', services: [{ id: 3, label: 'Chest X-Ray', price: 1200 }], date: '2023-11-02', time: '09:00 AM', status: 'Completed' },
-  ]);
-
-  const options = {
-    clients: [
-      { label: 'Abdur Rahman', value: 'Abdur Rahman' },
-      { label: 'Fatima Begum', value: 'Fatima Begum' },
-      { label: 'Zayan Ahmed', value: 'Zayan Ahmed' },
-      { label: 'Karin Sultana', value: 'Karin Sultana' }
-    ],
-    doctors: [
-      { label: 'Dr. Mahbubur Rahman', value: 'Dr. Mahbubur Rahman' },
-      { label: 'Dr. Nasrin Akter', value: 'Dr. Nasrin Akter' },
-      { label: 'Dr. Ashraful Islam', value: 'Dr. Ashraful Islam' },
-      { label: 'Dr. S.M. Ali', value: 'Dr. S.M. Ali' }
-    ],
-    services: [
-      { label: 'Blood Glucose', value: 'Blood Glucose', price: 250 },
-      { label: 'CBC', value: 'CBC', price: 600 },
-      { label: 'Lipid Profile', value: 'Lipid Profile', price: 1200 },
-      { label: 'Chest X-Ray', value: 'Chest X-Ray', price: 1200 },
-      { label: 'ECG', value: 'ECG', price: 800 },
-      { label: 'Ultrasonography', value: 'Ultrasonography', price: 1500 }
-    ]
-  };
+  const [consultations, setConsultations] = useState<ConsultationData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [options, setOptions] = useState({
+    clients: [] as any[],
+    doctors: [] as any[]
+  });
 
   const [selectedConsultation, setSelectedConsultation] = useState<ConsultationData | null>(null);
 
@@ -57,33 +34,113 @@ const Consultations = () => {
   const { openModal: openEdit, Modal: EditModal, closeModal: closeEdit } = usePopup("large");
   const { openModal: openDelete, Modal: DeleteModal, closeModal: closeDelete } = usePopup("medium");
 
-  const onAddSubmit = (data: any) => {
-    const newIdx = consultations.length + 1;
-    setConsultations([...consultations, { ...data, id: newIdx }]);
-    closeAdd();
+  const fetchAllData = async () => {
+    setLoading(true);
+    try {
+      const [list, patients, doctors] = await Promise.all([
+        window.api.invoke('CONSULTATION:LIST'),
+        window.api.invoke('PATIENT:LIST'),
+        window.api.invoke('DOCTOR:LIST')
+      ]);
+
+      setConsultations(list || []);
+      setOptions({
+        clients: (patients || []).map((p: any) => ({ label: p.name, value: p.id })),
+        doctors: (doctors || []).map((d: any) => ({ label: d.name, value: d.id, fee: d.consultationFee }))
+      });
+    } catch (error) {
+      console.error("Failed to fetch consultation data:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const onEditSubmit = (data: any) => {
-    setConsultations(consultations.map(a => a.id === selectedConsultation?.id ? { ...a, ...data } : a));
-    closeEdit();
+  useEffect(() => {
+    fetchAllData();
+  }, []);
+
+  const onAddSubmit = async (data: any) => {
+    try {
+      // `data.date` is already a full ISO string combined from date+time in the form
+      await window.api.invoke('CONSULTATION:CREATE', {
+        date: data.date || new Date().toISOString(),
+        patientId: Number(data.patientId || data.clientId),
+        doctorId: Number(data.doctorId),
+        consultationFee: Number(data.consultationFee),
+        notes: data.notes || null
+      });
+      fetchAllData();
+      closeAdd();
+    } catch (error) {
+      console.error("Failed to create consultation:", error);
+    }
   };
 
-  const handleDelete = () => {
+  const onEditSubmit = async (data: any) => {
+    if (!selectedConsultation) return;
+    try {
+      // `data.date` is already a full ISO string combined from date+time in the form
+      await window.api.invoke('CONSULTATION:UPDATE', {
+        id: selectedConsultation.id,
+        data: {
+          date: data.date,
+          patientId: Number(data.patientId || data.clientId),
+          doctorId: Number(data.doctorId),
+          consultationFee: Number(data.consultationFee),
+          notes: data.notes || null
+        }
+      });
+      fetchAllData();
+      closeEdit();
+    } catch (error) {
+      console.error("Failed to update consultation:", error);
+    }
+  };
+
+  const handleDelete = async () => {
     if (selectedConsultation) {
-      setConsultations(consultations.filter(a => a.id !== selectedConsultation.id));
-      setSelectedConsultation(null);
-      closeDelete();
+      try {
+        await window.api.invoke('CONSULTATION:DELETE', { id: selectedConsultation.id });
+        fetchAllData();
+        setSelectedConsultation(null);
+        closeDelete();
+      } catch (error) {
+        console.error("Failed to delete consultation:", error);
+      }
     }
   };
 
   const columns: ITableColumn[] = [
     { key: 'id', label: 'ID', headClass: 'w-16' },
-    { key: 'clientName', label: 'Patient Name', rowClass: 'font-bold' },
-    { key: 'age', label: 'Age' },
-    { key: 'gender', label: 'Gender' },
-    { key: 'doctorName', label: 'Doctor' },
-    { key: 'date', label: 'Date' },
-
+    { 
+      key: 'patient', 
+      label: 'Patient Name', 
+      rowClass: 'font-bold',
+      render: (val) => val?.name || 'N/A'
+    },
+    { 
+      key: 'patient_age', 
+      label: 'Age',
+      render: (_, row) => row.patient?.age || 'N/A'
+    },
+    { 
+      key: 'patient_gender', 
+      label: 'Gender',
+      render: (_, row) => row.patient?.gender || 'N/A'
+    },
+    { 
+      key: 'doctor', 
+      label: 'Doctor',
+      render: (val) => val?.name || 'N/A'
+    },
+    { 
+      key: 'date', 
+      label: 'Date & Time',
+      render: (val: any) => {
+        const d = new Date(val);
+        return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      }
+    },
     {
       key: 'actions', label: 'Actions', headClass: 'text-right', rowClass: 'text-right', render: (_, row) => (
         <div className="flex justify-end gap-1">
@@ -112,7 +169,7 @@ const Consultations = () => {
     <div className="space-y-4 animate-in fade-in duration-300">
       <div className="flex items-center justify-between rounded-lg">
         <div>
-          <h1 className="text-2xl font-black text-pos-primary font-exo2">Consultations</h1>
+          <h1 className="text-2xl font-black text-[#333333] font-exo2">Consultations</h1>
         </div>
         <Button
           onClick={openAdd}
@@ -125,7 +182,11 @@ const Consultations = () => {
       </div>
 
       <div className="bg-white border border-[#D1D5DB] rounded shadow-sm overflow-hidden">
-        <BasicTable columns={columns} data={consultations} />
+        {loading ? (
+          <div className="p-8 text-center text-gray-500 font-medium">Loading consultations...</div>
+        ) : (
+          <BasicTable columns={columns} data={consultations} />
+        )}
       </div>
 
       <AddModal title="Add New Consultation">

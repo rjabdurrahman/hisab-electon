@@ -10,32 +10,48 @@ interface AppointmentData {
   id?: number;
   clientName: string;
   doctorName: string;
-  services: { id: string | number; label: string }[];
+  serviceName: string;
   date: string;
-  time: string;
   status: 'Pending' | 'Confirmed' | 'Cancelled' | 'Completed';
 }
 
 interface AppointmentEditProps {
   initialData: AppointmentData;
-  onSubmit: (data: AppointmentData) => void;
+  onSubmit: (data: AppointmentData) => void | Promise<void>;
   onCancel: () => void;
   options: {
-    clients: { label: string; value: string }[];
-    doctors: { label: string; value: string }[];
-    services: { label: string; value: string }[];
+    clients: { label: string; value: string | number }[];
+    doctors: { label: string; value: string | number }[];
+    services: { label: string; value: string | number; price: number }[];
   }
 }
 
+/** Extract date and time in YYYY-MM-DDTHH:mm format for datetime-local input */
+const extractDateTime = (dateStr: string): string => {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  const offset = d.getTimezoneOffset() * 60000;
+  return new Date(d.getTime() - offset).toISOString().slice(0, 16);
+};
+
 const AppointmentEdit: React.FC<AppointmentEditProps> = ({ initialData, onSubmit, onCancel, options }) => {
+  const now = new Date();
+  const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+
   const methods = useForm<AppointmentData>({
-    defaultValues: initialData
+    defaultValues: initialData || {
+      clientName: "",
+      doctorName: "",
+      serviceName: "",
+      date: localDateTime,
+      status: "Pending"
+    }
   });
 
   const { control, setValue } = methods;
   const addedServices = useWatch({ control, name: "services" }) || [];
 
-  const handleAddService = (service: { id: string | number; label: string }) => {
+  const handleAddService = (service: { id: string | number; label: string; price: number }) => {
     setValue("services", [...addedServices, service]);
   };
 
@@ -55,12 +71,12 @@ const AppointmentEdit: React.FC<AppointmentEditProps> = ({ initialData, onSubmit
       <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
           <SearchSelect
-            name="clientName" 
-            label="Client" 
+            name="patientId" 
+            label="Patient" 
             options={options.clients} 
           />
           <SearchSelect 
-            name="doctorName" 
+            name="doctorId" 
             label="Doctor" 
             options={options.doctors} 
           />
@@ -75,11 +91,10 @@ const AppointmentEdit: React.FC<AppointmentEditProps> = ({ initialData, onSubmit
             />
         </div>
 
+        <div className="grid grid-cols-1 gap-4">
+          <FormInput name="date" label="Date & Time" type="datetime-local" required="Date and Time is required" />
+        </div>
         <div className="grid grid-cols-2 gap-4">
-          <div className="grid grid-cols-2 gap-2">
-             <FormInput name="date" label="Date" type="date" />
-             <FormInput name="time" label="Time" />
-          </div>
           <FormSelect
             name="status" 
             label="Appointment Status" 

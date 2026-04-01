@@ -4,42 +4,32 @@ import FormInput from "../form/FormInput";
 import FormSelect from "../form/FormSelect";
 import Button from "../buttons/Button";
 
-interface ClientData {
+interface PatientData {
   id?: number;
   name: string;
-  phone: string;
-  email: string;
-  address: string;
-  gender: string;
-  registeredAt?: string;
+  phone?: string;
+  gender?: 'Male' | 'Female' | 'Other';
+  age?: number;
 }
 
-interface ClientFormProps {
-  initialData?: ClientData | null;
-  onSubmit: (data: ClientData) => void;
+interface PatientEditProps {
+  initialData: PatientData;
+  onSubmit: (data: PatientData) => void | Promise<void>;
   onCancel: () => void;
 }
 
-const ClientForm: React.FC<ClientFormProps> = ({ initialData, onSubmit, onCancel }) => {
-  const methods = useForm<ClientData>({
-    defaultValues: initialData || {
-      name: "",
-      phone: "",
-      email: "",
-      address: "",
-      gender: "Male"
-    }
+const PatientEdit: React.FC<PatientEditProps> = ({ initialData, onSubmit, onCancel }) => {
+  const methods = useForm<PatientData>({
+    defaultValues: initialData
   });
 
   return (
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <FormInput name="name" label="Full Name" placeholder="e.g. John Doe" required="Name is required" />
-          <FormInput name="phone" label="Phone Number" placeholder="e.g. 01700000000" required="Phone is required" />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <FormInput name="email" label="Email Address" type="email" placeholder="john@example.com" />
+          <FormInput name="phone" label="Phone Number" placeholder="e.g. 01700000000" />
+          <FormInput name="age" label="Age" type="number" placeholder="e.g. 30" />
           <FormSelect 
             name="gender" 
             label="Gender" 
@@ -49,9 +39,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ initialData, onSubmit, onCancel
               { label: 'Other', value: 'Other' }
             ]} 
           />
-        </div>
-        <FormInput name="address" label="Home Address" placeholder="City, Area, Road" />
-        
+        </div>        
         <div className="pt-6 flex justify-end gap-2 border-t border-gray-100 -mx-5 px-5">
            <Button
             className="flex-1"
@@ -71,7 +59,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ initialData, onSubmit, onCancel
             type="submit"
             bgColor="#333333"
           >
-            {initialData ? "Update Client" : "Register Client"}
+            Update
           </Button>
         </div>
       </form>
@@ -79,4 +67,4 @@ const ClientForm: React.FC<ClientFormProps> = ({ initialData, onSubmit, onCancel
   );
 };
 
-export default ClientForm;
+export default PatientEdit;

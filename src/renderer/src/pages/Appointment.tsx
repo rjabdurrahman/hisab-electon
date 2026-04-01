@@ -9,9 +9,9 @@ import AppointmentEdit from '../components/popups/AppointmentEdit';
 
 interface AppointmentData {
   id: number;
-  clientName: string;
-  doctorName: string;
-  services: { id: string | number; label: string }[];
+  patientId: number;
+  doctorId: number;
+  services: { id: string | number; label: string; price: number }[];
   date: string;
   time: string;
   status: 'Pending' | 'Confirmed' | 'Cancelled' | 'Completed';
@@ -19,30 +19,30 @@ interface AppointmentData {
 
 const Appointment = () => {
   const [appointments, setAppointments] = useState<AppointmentData[]>([
-    { id: 1, clientName: 'Abdur Rahman', doctorName: 'Dr. Mahbubur Rahman', services: [{ id: 1, label: 'General Consultation' }], date: '2023-11-01', time: '10:00 AM', status: 'Confirmed' },
-    { id: 2, clientName: 'Fatima Begum', doctorName: 'Dr. Nasrin Akter', services: [{ id: 2, label: 'Dental Checkup' }], date: '2023-11-01', time: '11:00 AM', status: 'Pending' },
-    { id: 3, clientName: 'Zayan Ahmed', doctorName: 'Dr. Ashraful Islam', services: [{ id: 3, label: 'X-Ray Chest' }], date: '2023-11-02', time: '09:00 AM', status: 'Completed' },
+    { id: 1, patientId: 1, doctorId: 1, services: [{ id: 1, label: 'General Consultation', price: 500 }], date: '2023-11-01', time: '10:00 AM', status: 'Confirmed' },
+    { id: 2, patientId: 2, doctorId: 2, services: [{ id: 2, label: 'Dental Checkup', price: 1000 }], date: '2023-11-01', time: '11:00 AM', status: 'Pending' },
+    { id: 3, patientId: 3, doctorId: 3, services: [{ id: 3, label: 'X-Ray Chest', price: 800 }], date: '2023-11-02', time: '09:00 AM', status: 'Completed' },
   ]);
 
   const options = {
     clients: [
-      { label: 'Abdur Rahman', value: 'Abdur Rahman' },
-      { label: 'Fatima Begum', value: 'Fatima Begum' },
-      { label: 'Zayan Ahmed', value: 'Zayan Ahmed' },
-      { label: 'Karin Sultana', value: 'Karin Sultana' }
+      { label: 'Abdur Rahman', value: 1 },
+      { label: 'Fatima Begum', value: 2 },
+      { label: 'Zayan Ahmed', value: 3 },
+      { label: 'Karin Sultana', value: 4 }
     ],
     doctors: [
-      { label: 'Dr. Mahbubur Rahman', value: 'Dr. Mahbubur Rahman' },
-      { label: 'Dr. Nasrin Akter', value: 'Dr. Nasrin Akter' },
-      { label: 'Dr. Ashraful Islam', value: 'Dr. Ashraful Islam' },
-      { label: 'Dr. S.M. Ali', value: 'Dr. S.M. Ali' }
+      { label: 'Dr. Mahbubur Rahman', value: 1 },
+      { label: 'Dr. Nasrin Akter', value: 2 },
+      { label: 'Dr. Ashraful Islam', value: 3 },
+      { label: 'Dr. S.M. Ali', value: 4 }
     ],
     services: [
-      { label: 'General Consultation', value: 'General Consultation' },
-      { label: 'Dental Checkup', value: 'Dental Checkup' },
-      { label: 'X-Ray Chest', value: 'X-Ray Chest' },
-      { label: 'Blood Test', value: 'Blood Test' },
-      { label: 'Eye Exam', value: 'Eye Exam' }
+      { label: 'General Consultation', value: 1, price: 500 },
+      { label: 'Dental Checkup', value: 2, price: 1000 },
+      { label: 'X-Ray Chest', value: 3, price: 800 },
+      { label: 'Blood Test', value: 4, price: 300 },
+      { label: 'Eye Exam', value: 5, price: 400 }
     ]
   };
 
@@ -74,8 +74,17 @@ const Appointment = () => {
 
   const columns: ITableColumn[] = [
     { key: 'id', label: 'ID', headClass: 'w-16' },
-    { key: 'clientName', label: 'Patient / Client', rowClass: 'font-bold' },
-    { key: 'doctorName', label: 'Assigned Doctor' },
+    { 
+      key: 'patientId', 
+      label: 'Patient', 
+      rowClass: 'font-bold',
+      render: (val) => options.clients.find(c => c.value === val)?.label || 'Unknown'
+    },
+    { 
+      key: 'doctorId', 
+      label: 'Doctor',
+      render: (val) => options.doctors.find(d => d.value === val)?.label || 'Unassigned'
+    },
     { 
       key: 'services', 
       label: 'Services', 
@@ -89,8 +98,8 @@ const Appointment = () => {
         </div>
       )
     },
-    { key: 'date', label: 'Scheduled Date' },
-    { key: 'time', label: 'Time Slot' },
+    { key: 'date', label: 'Date' },
+    { key: 'time', label: 'Time' },
     {
       key: 'status', label: 'Status', render: (val) => (
         <span className={`px-2 py-0.5 rounded text-[10px] font-black tracking-wider 

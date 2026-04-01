@@ -7,6 +7,7 @@ interface SearchSelectProps {
   options: { value: string | number; label: string }[];
   placeholder?: string;
   onSelect?: (value: any) => void;
+  required?: string | boolean;
 }
 
 const SearchSelect: React.FC<SearchSelectProps> = ({
@@ -14,9 +15,10 @@ const SearchSelect: React.FC<SearchSelectProps> = ({
   label,
   options,
   placeholder = "Select...",
-  onSelect
+  onSelect,
+  required
 }) => {
-  const { setValue, watch, formState: { errors } } = useFormContext();
+  const { setValue, watch, register, formState: { errors } } = useFormContext();
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
@@ -54,7 +56,6 @@ const SearchSelect: React.FC<SearchSelectProps> = ({
     setIsOpen(true);
   };
 
-  const displayValue = isOpen ? searchTerm : (selectedOption ? selectedOption.label : "");
 
   return (
     <div className="w-full relative" ref={containerRef}>
@@ -65,7 +66,7 @@ const SearchSelect: React.FC<SearchSelectProps> = ({
       <div 
         className={`relative flex items-center border rounded transition-all duration-200 
         ${isOpen ? 'border-pos-primary ring-1 ring-pos-primary shadow-sm bg-white' : 'border-gray-300 hover:border-gray-400 bg-[#F4F4F4F2]'}
-        ${errors[name] ? 'border-red-500 bg-red-50' : ''}`}
+        ${errors && errors[name] ? 'border-red-500 bg-red-50' : ''}`}
       >
         <div className="flex-1 relative flex items-center">
             {/* Display selected label when NOT searching/open */}
@@ -134,9 +135,10 @@ const SearchSelect: React.FC<SearchSelectProps> = ({
         </div>
       )}
       
-      {errors[name] && (
+      <input {...register(name, { required })} type="hidden" />
+      {errors && errors[name] && (
         <p className="text-red-500 text-[10px] mt-1 font-bold italic uppercase tracking-wider">
-          {errors[name]?.message as string}
+          {(errors[name] as any)?.message}
         </p>
       )}
     </div>

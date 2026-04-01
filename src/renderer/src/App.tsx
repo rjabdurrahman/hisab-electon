@@ -4,9 +4,8 @@ import { useEffect } from "react";
 
 function App(): React.JSX.Element {
   useEffect(() => {
-    // Standard theme initialization matching pos-v2 logic
-    const savedTheme = localStorage.getItem('app-theme') || 'light';
-    document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+    // Default is always light. Dark only if user manually selected it.
+    document.documentElement.classList.toggle('dark', localStorage.theme === 'dark');
   }, []);
 
   return (

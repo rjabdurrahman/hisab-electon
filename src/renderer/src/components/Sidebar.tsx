@@ -11,7 +11,7 @@ const Sidebar: React.FC = () => {
     { id: 'consultations', label: 'CONSULTATIONS', icon: '💬' },
     { id: 'pathology-tests', label: 'PATHOLOGY TESTS', icon: '🧪' },
     { id: 'doctor', label: 'DOCTOR', icon: '👨‍⚕️' },
-    { id: 'client', label: 'PATIENT', icon: '👥' },
+    { id: 'patient', label: 'PATIENT', icon: '👥' },
     { id: 'investigations', label: 'INVESTIGATIONS', icon: '💼' },
   ];
 

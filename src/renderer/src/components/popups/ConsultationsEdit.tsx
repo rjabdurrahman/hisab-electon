@@ -4,69 +4,82 @@ import FormInput from '../form/FormInput'
 import Button from '../buttons/Button'
 import SearchSelect from '../form/SearchSelect'
 
-interface ConsultationData {
-  clientName: string
-  doctorName: string
-  age: number
-  gender: 'Male' | 'Female' | 'Other'
+interface ConsultationFormData {
+  id?: number
+  patientId: number
+  doctorId: number
   date: string
-  time: string
+  consultationFee: number
+  notes?: string
 }
 
 interface ConsultationsEditProps {
-  onSubmit: (data: ConsultationData) => void
+  onSubmit: (data: any) => void | Promise<void>
   onCancel: () => void
-  defaultValues: ConsultationData
+  initialData: any
   options: {
-    clients: { label: string; value: string }[]
-    doctors: { label: string; value: string }[]
-    services: { label: string; value: string; price: number }[]
+    clients: { label: string; value: number }[]
+    doctors: { label: string; value: number; fee?: number }[]
   }
+}
+
+/** Extract date and time in YYYY-MM-DDTHH:mm format for datetime-local input */
+const extractDateTime = (dateStr: string): string => {
+  if (!dateStr) return ''
+  const d = new Date(dateStr)
+  const offset = d.getTimezoneOffset() * 60000
+  return new Date(d.getTime() - offset).toISOString().slice(0, 16)
 }
 
 const ConsultationsEdit: React.FC<ConsultationsEditProps> = ({
   onSubmit,
   onCancel,
-  defaultValues,
+  initialData,
   options
 }) => {
-  const now = new Date()
-  const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-    .toISOString()
-    .slice(0, 16)
-
-  const methods = useForm<ConsultationData>({
+  const methods = useForm<ConsultationFormData>({
     defaultValues: {
-      clientName: defaultValues?.clientName || '',
-      doctorName: defaultValues?.doctorName || '',
-      age: defaultValues?.age || 0,
-      gender: defaultValues?.gender || 'Male',
-      date: defaultValues?.date || localDate,
-      time: defaultValues?.time || '10:00 AM'
+      id: initialData?.id,
+      patientId: initialData?.patient?.id || initialData?.patientId,
+      doctorId: initialData?.doctor?.id || initialData?.doctorId,
+      date: extractDateTime(initialData?.date),
+      consultationFee: initialData?.consultationFee || 0,
+      notes: initialData?.notes || ''
     }
   })
 
+  const handleFormSubmit = (data: ConsultationFormData) => {
+    // Current input is YYYY-MM-DDTHH:mm, convert to full ISO for DB
+    const combinedDateTime = new Date(data.date).toISOString()
+    onSubmit({ ...data, date: combinedDateTime })
+  }
+
   return (
     <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 gap-2">
-          <div className="w-full">
-            <FormInput name="date" label={'Date'} type="datetime-local" className="w-full" />
-          </div>
+      <form onSubmit={methods.handleSubmit(handleFormSubmit)} className="space-y-6">
+        <div className="grid grid-cols-1 gap-4">
+          <FormInput name="date" label="Date & Time" type="datetime-local" required="Date and Time is required" />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <FormInput name="consultationFee" label="Consultation Fee" type="number" required />
+          <div />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <SearchSelect
-            name="clientName"
+            name="patientId"
             label="Select Patient"
             placeholder="Search Patient..."
             options={options.clients}
           />
           <SearchSelect
-            name="doctorName"
+            name="doctorId"
             label="Assign Doctor"
             placeholder="Select Doctor..."
             options={options.doctors}
           />
+        </div>
+        <div className="grid grid-cols-1 gap-4">
+          <FormInput name="notes" label="Consultation Notes (Optional)" placeholder="e.g. Regular checkup" />
         </div>
         <div className="flex justify-end gap-2">
           <Button

@@ -7,12 +7,9 @@ import Button from '../buttons/Button'
 interface DoctorData {
   id?: number
   name: string
-  specialty: string
-  phone: string
-  availability: string
-  gender?: string
-  joiningDate?: string
-  doctorsFee?: number
+  specialization?: string
+  phone?: string
+  consultationFee: number
 }
 
 interface DoctorEditProps {
@@ -29,36 +26,13 @@ const DoctorEdit: React.FC<DoctorEditProps> = ({ initialData, onSubmit, onCancel
   return (
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid grid-cols-1 gap-4">
-          <FormInput name="joiningDate" label="Joining Date" type="date" />
-        </div>
         <div className="grid grid-cols-2 gap-4">
           <FormInput name="name" label="Full Name" required="Name is required" />
-          <FormInput name="specialty" label="Medical Specialty" required="Specialty is required" />
+          <FormInput name="specialization" label="Medical Specialty" required="Specialty is required" />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <FormInput name="phone" label="Contact Number" />
-          <FormSelect
-            name="gender"
-            label="Gender"
-            options={[
-              { label: 'Male', value: 'Male' },
-              { label: 'Female', value: 'Female' },
-              { label: 'Other', value: 'Other' }
-            ]}
-          />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <FormSelect
-            name="availability"
-            label="Availability Shift"
-            options={[
-              { label: 'Morning', value: 'Morning' },
-              { label: 'Afternoon', value: 'Afternoon' },
-              { label: 'Evening', value: 'Evening' }
-            ]}
-          />
-          <FormInput name="doctorsFee" label="Doctor's Fee" type="number" placeholder="e.g. 500" />
+          <FormInput name="consultationFee" label="Consultation Fee" type="number" placeholder="e.g. 500" />
         </div>
 
         <div className="pt-6 flex justify-end gap-2 border-t border-gray-100 -mx-5 px-5">
