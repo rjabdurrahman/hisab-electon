@@ -1,7 +1,6 @@
 import React from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import FormInput from '../form/FormInput'
-import FormSelect from '../form/FormSelect'
 import Button from '../buttons/Button'
 
 interface DoctorData {

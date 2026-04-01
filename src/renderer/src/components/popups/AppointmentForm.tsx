@@ -6,9 +6,9 @@ import Button from "../buttons/Button";
 
 interface AppointmentData {
   id?: number;
-  clientName: string;
-  doctorName: string;
-  serviceName: string;
+  patientId: number;
+  doctorId: number;
+  services: { id: string | number; label: string; price: number }[];
   date: string;
   status: 'Pending' | 'Confirmed' | 'Cancelled' | 'Completed';
 }
@@ -28,11 +28,21 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ initialData, onSubmit
   const now = new Date();
   const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
 
+  const extractDateTime = (dateStr?: string): string => {
+    if (!dateStr) return localDateTime;
+    const d = new Date(dateStr);
+    const offset = d.getTimezoneOffset() * 60000;
+    return new Date(d.getTime() - offset).toISOString().slice(0, 16);
+  };
+
   const methods = useForm<AppointmentData>({
-    defaultValues: initialData || {
-      clientName: "",
-      doctorName: "",
-      serviceName: "",
+    defaultValues: initialData ? {
+      ...initialData,
+      date: extractDateTime((initialData as any).date)
+    } : {
+      patientId: 0,
+      doctorId: 0,
+      services: [],
       date: localDateTime,
       status: "Pending"
     }

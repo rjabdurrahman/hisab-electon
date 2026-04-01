@@ -64,9 +64,9 @@ const Consultations = () => {
       // `data.date` is already a full ISO string combined from date+time in the form
       await window.api.invoke('CONSULTATION:CREATE', {
         date: data.date || new Date().toISOString(),
-        patientId: Number(data.patientId || data.clientId),
-        doctorId: Number(data.doctorId),
-        consultationFee: Number(data.consultationFee),
+        patientId: Number(data.patientId || data.clientId || 0),
+        doctorId: Number(data.doctorId || 0),
+        consultationFee: Number(data.consultationFee || 0),
         notes: data.notes || null
       });
       fetchAllData();
@@ -84,9 +84,9 @@ const Consultations = () => {
         id: selectedConsultation.id,
         data: {
           date: data.date,
-          patientId: Number(data.patientId || data.clientId),
-          doctorId: Number(data.doctorId),
-          consultationFee: Number(data.consultationFee),
+          patientId: Number(data.patientId || data.clientId || 0),
+          doctorId: Number(data.doctorId || 0),
+          consultationFee: Number(data.consultationFee || 0),
           notes: data.notes || null
         }
       });

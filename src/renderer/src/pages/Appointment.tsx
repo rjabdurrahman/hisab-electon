@@ -13,15 +13,14 @@ interface AppointmentData {
   doctorId: number;
   services: { id: string | number; label: string; price: number }[];
   date: string;
-  time: string;
   status: 'Pending' | 'Confirmed' | 'Cancelled' | 'Completed';
 }
 
 const Appointment = () => {
   const [appointments, setAppointments] = useState<AppointmentData[]>([
-    { id: 1, patientId: 1, doctorId: 1, services: [{ id: 1, label: 'General Consultation', price: 500 }], date: '2023-11-01', time: '10:00 AM', status: 'Confirmed' },
-    { id: 2, patientId: 2, doctorId: 2, services: [{ id: 2, label: 'Dental Checkup', price: 1000 }], date: '2023-11-01', time: '11:00 AM', status: 'Pending' },
-    { id: 3, patientId: 3, doctorId: 3, services: [{ id: 3, label: 'X-Ray Chest', price: 800 }], date: '2023-11-02', time: '09:00 AM', status: 'Completed' },
+    { id: 1, patientId: 1, doctorId: 1, services: [{ id: 1, label: 'General Consultation', price: 500 }], date: '2023-11-01T10:00:00.000Z', status: 'Confirmed' },
+    { id: 2, patientId: 2, doctorId: 2, services: [{ id: 2, label: 'Dental Checkup', price: 1000 }], date: '2023-11-01T11:00:00.000Z', status: 'Pending' },
+    { id: 3, patientId: 3, doctorId: 3, services: [{ id: 3, label: 'X-Ray Chest', price: 800 }], date: '2023-11-02T09:00:00.000Z', status: 'Completed' },
   ]);
 
   const options = {
@@ -98,8 +97,14 @@ const Appointment = () => {
         </div>
       )
     },
-    { key: 'date', label: 'Date' },
-    { key: 'time', label: 'Time' },
+    { 
+      key: 'date', 
+      label: 'Date & Time',
+      render: (val: any) => {
+        const d = new Date(val);
+        return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      }
+    },
     {
       key: 'status', label: 'Status', render: (val) => (
         <span className={`px-2 py-0.5 rounded text-[10px] font-black tracking-wider 

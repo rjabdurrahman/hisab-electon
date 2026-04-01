@@ -64,9 +64,9 @@ const PathologyTests = () => {
     try {
       await window.api.invoke('PATHOLOGY:CREATE', {
         date: data.date,
-        patientId: Number(data.patientId),
+        patientId: Number(data.patientId || 0),
         doctorId: data.doctorId ? Number(data.doctorId) : undefined,
-        testIds: data.services?.map((s: any) => Number(s.id)) || []
+        testIds: data.services?.map((s: any) => Number(s.id || 0)) || []
       });
       fetchAllData();
       closeAdd();
@@ -80,9 +80,9 @@ const PathologyTests = () => {
       await window.api.invoke('PATHOLOGY:UPDATE', {
         id: selectedTest?.id,
         date: data.date,
-        patientId: Number(data.patientId),
+        patientId: Number(data.patientId || 0),
         doctorId: data.doctorId ? Number(data.doctorId) : undefined,
-        testIds: data.services?.map((s: any) => Number(s.id)) || []
+        testIds: data.services?.map((s: any) => Number(s.id || 0)) || []
       });
       fetchAllData();
       closeEdit();

@@ -8,9 +8,9 @@ import ServiceSearchAdd from "../form/ServiceSearchAdd";
 
 interface AppointmentData {
   id?: number;
-  clientName: string;
-  doctorName: string;
-  serviceName: string;
+  patientId: number;
+  doctorId: number;
+  services: { id: string | number; label: string; price: number }[];
   date: string;
   status: 'Pending' | 'Confirmed' | 'Cancelled' | 'Completed';
 }
@@ -35,16 +35,11 @@ const extractDateTime = (dateStr: string): string => {
 };
 
 const AppointmentEdit: React.FC<AppointmentEditProps> = ({ initialData, onSubmit, onCancel, options }) => {
-  const now = new Date();
-  const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
 
   const methods = useForm<AppointmentData>({
-    defaultValues: initialData || {
-      clientName: "",
-      doctorName: "",
-      serviceName: "",
-      date: localDateTime,
-      status: "Pending"
+    defaultValues: {
+      ...initialData,
+      date: extractDateTime(initialData?.date)
     }
   });
 
