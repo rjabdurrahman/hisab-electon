@@ -125,3 +125,25 @@ export function queryBuilder(params: Record<string, any>): string {
     const queryString = searchParams.toString();
     return queryString ? `?${queryString}` : "";
 };
+
+export function numberToWords(numStr: number | string): string {
+    const a = ['','One ','Two ','Three ','Four ', 'Five ','Six ','Seven ','Eight ','Nine ','Ten ','Eleven ','Twelve ','Thirteen ','Fourteen ','Fifteen ','Sixteen ','Seventeen ','Eighteen ','Nineteen '];
+    const b = ['', '', 'Twenty','Thirty','Forty','Fifty', 'Sixty','Seventy','Eighty','Ninety'];
+    
+    let num = parseInt(numStr.toString(), 10);
+    if(isNaN(num)) return '';
+    if (num === 0) return 'zero';
+    if ((num = num.toString().length > 9 ? 0 : num) === 0) return 'overflow';
+
+    const n = ('000000000' + num).slice(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+    if (!n) return '';
+    
+    let str = '';
+    str += (n[1] !== '00') ? (a[Number(n[1])] || b[parseInt(n[1][0], 10)] + ' ' + a[parseInt(n[1][1], 10)]) + 'Crore ' : '';
+    str += (n[2] !== '00') ? (a[Number(n[2])] || b[parseInt(n[2][0], 10)] + ' ' + a[parseInt(n[2][1], 10)]) + 'Lakh ' : '';
+    str += (n[3] !== '00') ? (a[Number(n[3])] || b[parseInt(n[3][0], 10)] + ' ' + a[parseInt(n[3][1], 10)]) + 'Thousand ' : '';
+    str += (n[4] !== '0') ? (a[Number(n[4])] || b[parseInt(n[4][0], 10)] + ' ' + a[parseInt(n[4][1], 10)]) + 'Hundred ' : '';
+    str += (n[5] !== '00') ? ((str !== '') ? 'and ' : '') + (a[Number(n[5])] || b[parseInt(n[5][0], 10)] + ' ' + a[parseInt(n[5][1], 10)]) : '';
+    
+    return str.trim();
+}

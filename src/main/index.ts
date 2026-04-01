@@ -1,6 +1,7 @@
 import "reflect-metadata";
-import { app, shell, BrowserWindow, ipcMain } from "electron";
+import { app, shell, BrowserWindow, ipcMain, Menu } from "electron";
 import { join } from "path";
+import fs from "fs";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import icon from "../../resources/icon.png?asset";
 import { AppDataSource } from "./database/data-source";
@@ -133,6 +134,131 @@ app.whenReady().then(async () => {
           return await ConsultationService.update(payload.id, payload.data);
         case "CONSULTATION:DELETE":
           return await ConsultationService.delete(payload.id);
+
+        // APP:GENERATE_PDF - Creates a PDF file in background (Hidden Window)
+        case "APP:GENERATE_PDF": {
+          return new Promise((resolve, reject) => {
+            const printWindow = new BrowserWindow({
+              show: false,
+              webPreferences: {
+                preload: join(__dirname, "../preload/index.js"),
+                sandbox: true,
+                contextIsolation: true,
+                nodeIntegration: false,
+              },
+            });
+
+            const dataParam = encodeURIComponent(JSON.stringify(payload.data));
+            
+            // For HashRouter, we must use /#/print/pathology
+            const url = is.dev && process.env["ELECTRON_RENDERER_URL"]
+              ? `${process.env["ELECTRON_RENDERER_URL"]}#/print/pathology?data=${dataParam}`
+              : `file://${join(__dirname, "../renderer/index.html")}#/print/pathology?data=${dataParam}`;
+
+            console.log(`[PDF Engine] Loading URL: ${url}`);
+            printWindow.loadURL(url);
+
+            // Wait for signal OR just wait a bit (Dolil/Standard approach)
+            // 1.2s is usually plenty for local React components to settle
+            setTimeout(async () => {
+              try {
+                console.log(`[PDF Engine] Capturing PDF...`);
+                const data = await printWindow.webContents.printToPDF({
+                  printBackground: true,
+                  pageSize: 'A5',
+                  marginsType: 1, // small margins
+                });
+
+                const tempDir = join(app.getPath("temp"), "hisab_prints");
+                if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+
+                const fileName = `receipt_${Date.now()}.pdf`;
+                const filePath = join(tempDir, fileName);
+                fs.writeFileSync(filePath, data);
+
+                console.log(`[PDF Engine] PDF generated at: ${filePath}`);
+                printWindow.close();
+                resolve({ success: true, filePath });
+              } catch (err) {
+                console.error(`[PDF Engine] Error:`, err);
+                if (!printWindow.isDestroyed()) printWindow.close();
+                reject(err);
+              }
+            }, 1200); 
+          });
+        }
+
+        // APP:OPEN_PDF_VIEWER - Opens a dedicated PDF viewer window
+        case "APP:OPEN_PDF_VIEWER": {
+          const { filePath, title } = payload;
+          if (!fs.existsSync(filePath)) throw new Error("PDF file not found");
+
+          const pdfWindow = new BrowserWindow({
+            title: title || "Print Preview",
+            autoHideMenuBar: true,
+            width: 1024,
+            height: 768,
+            webPreferences: {
+              plugins: true, // Enables Chromium PDF native viewer
+              nodeIntegration: false,
+              contextIsolation: true,
+            },
+          });
+
+          // Custom Native Menu for PDF Window
+          const menu = Menu.buildFromTemplate([
+            {
+              label: "ফাইল", // User prefers Bengali labels
+              submenu: [
+                { label: "প্রিন্ট", accelerator: "CmdOrCtrl+P", click: () => pdfWindow.webContents.print() },
+                { type: "separator" },
+                { label: "উইন্ডো বন্ধ করুন", accelerator: "CmdOrCtrl+W", click: () => pdfWindow.close() }
+              ]
+            }
+          ]);
+          pdfWindow.setMenu(menu);
+          pdfWindow.maximize();
+          pdfWindow.loadURL(`file://${filePath}`);
+          return true;
+        }
+
+        case "APP:DONE_READY_TO_PRINT":
+          // Legacy/No longer strictly needed for PDF Engine but kept for direct APP:PRINT
+          ipcMain.emit("api-invoke-DONE_READY_TO_PRINT");
+          return true;
+
+        // App Actions
+        case "APP:PRINT": {
+          const printWindow = new BrowserWindow({
+            show: false, // Hidden window
+            webPreferences: {
+              preload: join(__dirname, "../preload/index.js"),
+              sandbox: true,
+              contextIsolation: true,
+            },
+          });
+
+          const dataParam = encodeURIComponent(JSON.stringify(payload.data));
+          const url = is.dev && process.env["ELECTRON_RENDERER_URL"]
+            ? `${process.env["ELECTRON_RENDERER_URL"]}#/print/pathology?data=${dataParam}`
+            : `file://${join(__dirname, "../renderer/index.html")}#/print/pathology?data=${dataParam}`;
+
+          printWindow.loadURL(url);
+
+          // We wait for the renderer to say it's ready to print
+          ipcMain.once("api-invoke-DONE_READY_TO_PRINT", () => {
+            printWindow.webContents.print(
+              {
+                silent: payload?.silent ?? false,
+                printBackground: payload?.printBackground ?? false,
+              },
+              () => {
+                printWindow.close();
+              }
+            );
+          });
+          return true;
+        }
 
         default:
           throw new Error(`Unknown action: ${action}`);

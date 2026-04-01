@@ -6,6 +6,7 @@ import usePopup from '../hooks/usePopup';
 import Delete from '../components/Delete';
 import TestAdd from '../components/popups/PathologyTestAdd';
 import TestEdit from '../components/popups/PathologyTestEdit';
+import PathologyPrintReceipt from '../components/print/PathologyPrintReceipt';
 
 interface PathologyTestData {
   id: number;
@@ -33,6 +34,31 @@ const PathologyTests = () => {
   const { openModal: openAdd, Modal: AddModal, closeModal: closeAdd } = usePopup("large");
   const { openModal: openEdit, Modal: EditModal, closeModal: closeEdit } = usePopup("large");
   const { openModal: openDelete, Modal: DeleteModal, closeModal: closeDelete } = usePopup("medium");
+  const { openModal: openPrintPreview, Modal: PrintPreviewModal, closeModal: closePrintPreview } = usePopup("large");
+
+  const executePrint = async () => {
+    if (!selectedTest) return;
+    
+    // Close the preview modal
+    closePrintPreview();
+    
+    try {
+      console.log("Generating PDF...");
+      // Step 1: Generate PDF in background
+      const result: any = await window.api.invoke("APP:GENERATE_PDF", { data: selectedTest });
+      
+      if (result && result.success) {
+        // Step 2: Open PDF in dedicated viewer
+        await window.api.invoke("APP:OPEN_PDF_VIEWER", { 
+          filePath: result.filePath, 
+          title: `Receipt - ${selectedTest.patientName}` 
+        });
+      }
+    } catch (e) {
+      console.error("Print flow failed:", e);
+      alert("Failed to generate print preview.");
+    }
+  };
 
   const fetchAllData = async () => {
     setLoading(true);
@@ -166,6 +192,14 @@ const PathologyTests = () => {
           <Button
             variant="icon"
             size="extraSmall"
+            onClick={() => { setSelectedTest(row); openPrintPreview(); }}
+            textColor="#2563EB"
+          >
+            🖨️
+          </Button>
+          <Button
+            variant="icon"
+            size="extraSmall"
             onClick={() => { setSelectedTest(row); openEdit(); }}
             textColor="#333333"
           >
@@ -226,6 +260,26 @@ const PathologyTests = () => {
       <DeleteModal title="Delete">
         <Delete handleDelete={handleDelete} />
       </DeleteModal>
+
+      <PrintPreviewModal title="Print Receipt">
+        {selectedTest && (
+          <div className="flex flex-col items-center">
+            {/* The preview container */}
+            <div className="border shadow-lg bg-gray-100 p-2 overflow-auto max-h-[70vh] mb-4 w-full flex justify-center">
+              <PathologyPrintReceipt data={selectedTest} />
+            </div>
+            <div className="flex gap-4 w-full justify-end">
+              <Button variant="outlined" onClick={closePrintPreview} textColor="#333">Cancel</Button>
+              <Button bgColor="#2CAFFE" textColor="#fff" onClick={executePrint}>🖨️ Print Now</Button>
+            </div>
+          </div>
+        )}
+      </PrintPreviewModal>
+
+      {/* Render the section off-screen so the system print dialog can 'snapshot' it for the preview */}
+      <div id="print-section" style={{ position: 'fixed', left: '-9999px', top: '0', width: '148mm', zIndex: -1 }}>
+         {selectedTest && <PathologyPrintReceipt data={selectedTest} />}
+      </div>
     </div>
   );
 };

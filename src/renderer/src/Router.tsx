@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createHashRouter, Navigate } from "react-router-dom";
 import UserPanelLayout from "./layout/UserPanelLayout";
 import Dashboard from "./pages/Dashboard";
 import Doctor from "./pages/Doctor";
@@ -6,8 +6,9 @@ import Patient from "./pages/Patient";
 import Investigations from "./pages/Investigations";
 import PathologyTests from "./pages/PathologyTests";
 import Consultations from "./pages/Consultations";
+import PathologyPrintPage from "./pages/PathologyPrintPage";
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: "/",
     element: <UserPanelLayout />,
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
         element: <Investigations />,
       },
     ],
+  },
+  {
+    path: "/print/pathology",
+    element: <PathologyPrintPage />,
   },
 ]);
 
