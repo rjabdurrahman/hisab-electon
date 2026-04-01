@@ -110,6 +110,14 @@ const PathologyTests = () => {
   const columns: ITableColumn[] = [
     { key: 'id', label: 'ID', headClass: 'w-16' },
     { 
+      key: 'date', 
+      label: 'Date & Time',
+      render: (val: any) => {
+        const d = new Date(val);
+        return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      }
+    },
+    { 
       key: 'patient', 
       label: 'Patient Name', 
       rowClass: 'font-bold',
@@ -119,19 +127,6 @@ const PathologyTests = () => {
       key: 'doctor', 
       label: 'Ref. Doctor',
       render: (val: any) => val?.name || 'Self/None'
-    },
-    { 
-      key: 'investigations', 
-      label: 'Tests & Prices', 
-      render: (val: any[]) => (
-        <div className="flex flex-wrap gap-1">
-          {val?.map((s) => (
-            <span key={s.id} className="bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-[10px] font-bold border border-blue-100 flex items-center gap-1">
-              {s.name} <span className="opacity-50 font-mono">৳{s.price}</span>
-            </span>
-          ))}
-        </div>
-      )
     },
      {
         key: 'totalAmount',
@@ -153,12 +148,17 @@ const PathologyTests = () => {
         }
      },
     { 
-      key: 'date', 
-      label: 'Date & Time',
-      render: (val: any) => {
-        const d = new Date(val);
-        return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-      }
+      key: 'investigations', 
+      label: 'Tests & Prices', 
+      render: (val: any[]) => (
+        <div className="flex flex-wrap gap-1">
+          {val?.map((s) => (
+            <span key={s.id} className="bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-[10px] font-bold border border-blue-100 flex items-center gap-1">
+              {s.name} <span className="opacity-50 font-mono">৳{s.price}</span>
+            </span>
+          ))}
+        </div>
+      )
     },
     {
       key: 'actions', label: 'Actions', headClass: 'text-right', rowClass: 'text-right', render: (_, row) => (

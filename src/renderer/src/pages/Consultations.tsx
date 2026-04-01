@@ -116,6 +116,14 @@ const Consultations = () => {
   const columns: ITableColumn[] = [
     { key: 'id', label: 'ID', headClass: 'w-16' },
     { 
+      key: 'date', 
+      label: 'Date & Time',
+      render: (val: any) => {
+        const d = new Date(val);
+        return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      }
+    },
+    { 
       key: 'patient', 
       label: 'Patient Name', 
       rowClass: 'font-bold',
@@ -159,14 +167,6 @@ const Consultations = () => {
       key: 'notes', 
       label: 'Note', 
       render: (val: any) => <span className="text-gray-500 italic text-sm line-clamp-1">{val || 'N/A'}</span>
-    },
-    { 
-      key: 'date', 
-      label: 'Date & Time',
-      render: (val: any) => {
-        const d = new Date(val);
-        return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-      }
     },
     {
       key: 'actions', label: 'Actions', headClass: 'text-right', rowClass: 'text-right', render: (_, row) => (
