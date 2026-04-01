@@ -9,6 +9,7 @@ interface PathologyTestFormData {
   patientId: number;
   doctorId?: number;
   services: { id: string | number; label: string; price: number }[];
+  discount: number;
   date: string;
 }
 
@@ -33,6 +34,7 @@ const PathologyTestAdd: React.FC<PathologyTestAddProps> = ({ onSubmit, onCancel,
       patientId: 0,
       doctorId: undefined,
       services: [],
+      discount: 0,
       date: localDateTime,
     }
   });
@@ -72,6 +74,8 @@ const PathologyTestAdd: React.FC<PathologyTestAddProps> = ({ onSubmit, onCancel,
             placeholder="Select Doctor..."
             options={options.doctors}
           />
+
+          <FormInput name="discount" label="Discount Amount" type="number" />
         </div>
 
         <div className="border-t border-gray-100 pt-4">

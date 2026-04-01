@@ -11,6 +11,7 @@ interface PathologyTestData {
   id: number;
   date: string;
   totalAmount: number;
+  discount: number;
   patient: { id: number; name: string };
   doctor?: { id: number; name: string };
   investigations: { id: number; name: string; price: number }[];
@@ -66,6 +67,7 @@ const PathologyTests = () => {
         date: data.date,
         patientId: Number(data.patientId || 0),
         doctorId: data.doctorId ? Number(data.doctorId) : undefined,
+        discount: Number(data.discount || 0),
         testIds: data.services?.map((s: any) => Number(s.id || 0)) || []
       });
       fetchAllData();
@@ -82,6 +84,7 @@ const PathologyTests = () => {
         date: data.date,
         patientId: Number(data.patientId || 0),
         doctorId: data.doctorId ? Number(data.doctorId) : undefined,
+        discount: Number(data.discount || 0),
         testIds: data.services?.map((s: any) => Number(s.id || 0)) || []
       });
       fetchAllData();
@@ -130,11 +133,25 @@ const PathologyTests = () => {
         </div>
       )
     },
-    {
-       key: 'totalAmount',
-       label: 'Total',
-       render: (val: any) => <span className="font-black text-[#2CAFFE] font-mono text-sm">৳{Number(val).toLocaleString()}</span>
-    },
+     {
+        key: 'totalAmount',
+        label: 'Sub Total',
+        render: (val: any) => <span className="font-bold text-gray-600 font-mono text-sm">৳{Number(val).toLocaleString()}</span>
+     },
+     {
+        key: 'discount',
+        label: 'Discount',
+        render: (val: any) => <span className="font-bold text-red-500 font-mono text-sm">-{Number(val || 0).toLocaleString()}</span>
+     },
+     {
+        key: 'grandTotal',
+        label: 'Grand Total',
+        render: (_, row) => {
+          const total = Number(row.totalAmount || 0);
+          const disc = Number(row.discount || 0);
+          return <span className="font-black text-emerald-600 font-mono text-sm">৳{(total - disc).toLocaleString()}</span>
+        }
+     },
     { 
       key: 'date', 
       label: 'Date & Time',

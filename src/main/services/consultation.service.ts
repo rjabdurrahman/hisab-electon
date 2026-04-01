@@ -11,7 +11,7 @@ export class ConsultationService {
     return JSON.parse(JSON.stringify(result));
   }
 
-  static async create(data: { date: string; patientId: number; doctorId: number; consultationFee?: number; notes?: string }) {
+  static async create(data: { date: string; patientId: number; doctorId: number; consultationFee?: number; discount?: number; notes?: string }) {
     const repository = AppDataSource.getRepository(Consultation);
     const consultation = repository.create({
       ...data,
@@ -33,6 +33,8 @@ export class ConsultationService {
   static async update(id: number, data: Partial<Consultation>) {
     const repository = AppDataSource.getRepository(Consultation);
     if (data.date) data.date = new Date(data.date);
+    // Explicitly handle discount if provided
+    if (data.discount !== undefined) data.discount = Number(data.discount);
     await repository.update(id, data);
     return await this.getOne(id);
   }

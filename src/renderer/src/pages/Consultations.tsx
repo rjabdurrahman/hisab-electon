@@ -15,6 +15,7 @@ interface ConsultationData {
   patient: { id: number; name: string; age?: number; gender?: string };
   doctor: { id: number; name: string };
   consultationFee?: number;
+  discount: number;
   notes?: string;
   createdAt: string;
 }
@@ -67,6 +68,7 @@ const Consultations = () => {
         patientId: Number(data.patientId || data.clientId || 0),
         doctorId: Number(data.doctorId || 0),
         consultationFee: Number(data.consultationFee || 0),
+        discount: Number(data.discount || 0),
         notes: data.notes || null
       });
       fetchAllData();
@@ -87,6 +89,7 @@ const Consultations = () => {
           patientId: Number(data.patientId || data.clientId || 0),
           doctorId: Number(data.doctorId || 0),
           consultationFee: Number(data.consultationFee || 0),
+          discount: Number(data.discount || 0),
           notes: data.notes || null
         }
       });
@@ -137,6 +140,20 @@ const Consultations = () => {
       key: 'consultationFee', 
       label: 'Fee', 
       render: (val: any) => <span className="font-bold text-[#2CAFFE]">৳{Number(val || 0).toLocaleString()}</span>
+    },
+    { 
+      key: 'discount', 
+      label: 'Discount', 
+      render: (val: any) => <span className="text-red-500 font-bold">-{Number(val || 0).toLocaleString()}</span>
+    },
+    { 
+      key: 'grandTotal', 
+      label: 'Grand Total', 
+      render: (_, row) => {
+        const fee = Number(row.consultationFee || 0);
+        const disc = Number(row.discount || 0);
+        return <span className="font-black text-emerald-600">৳{(fee - disc).toLocaleString()}</span>
+      }
     },
     { 
       key: 'notes', 

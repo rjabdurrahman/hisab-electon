@@ -31,6 +31,9 @@ export class PathologyTest {
   @Column("decimal", { precision: 10, scale: 2, default: 0.00, name: "total_amount" })
   totalAmount!: number;
 
+  @Column("decimal", { precision: 10, scale: 2, default: 0, name: "discount" })
+  discount!: number;
+
   @OneToMany(() => PathologyTestInvestigation, (pti) => pti.pathologyTest)
   investigations!: PathologyTestInvestigation[];
 
