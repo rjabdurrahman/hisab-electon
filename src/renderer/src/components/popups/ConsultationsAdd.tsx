@@ -64,27 +64,24 @@ const ConsultationsAdd: React.FC<ConsultationsAddProps> = ({ onSubmit, onCancel,
       <form onSubmit={methods.handleSubmit(handleFormSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 gap-4">
           <FormInput name="date" label={'Date & Time'} type="datetime-local" required="Date and Time is required" />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <FormInput name="consultationFee" label="Consultation Fee" type="number" required />
-          <div />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
+          
           <SearchSelect
             name="patientId"
             label="Select Patient"
             placeholder="Search Patient..."
             options={options.clients}
           />
+          
           <SearchSelect
             name="doctorId"
             label="Assign Doctor"
             placeholder="Select Doctor..."
             options={options.doctors}
           />
-        </div>
-        <div className="grid grid-cols-1 gap-4">
-          <FormInput name="notes" label="Consultation Notes (Optional)" placeholder="e.g. Regular checkup" />
+
+          <FormInput name="consultationFee" label="Consultation Fee" type="number" required />
+
+          <FormInput name="notes" label="Note" placeholder="e.g. Regular checkup" />
         </div>
         <div className="flex justify-end gap-2">
           <Button

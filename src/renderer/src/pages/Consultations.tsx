@@ -134,6 +134,16 @@ const Consultations = () => {
       render: (val) => val?.name || 'N/A'
     },
     { 
+      key: 'consultationFee', 
+      label: 'Fee', 
+      render: (val: any) => <span className="font-bold text-[#2CAFFE]">৳{Number(val || 0).toLocaleString()}</span>
+    },
+    { 
+      key: 'notes', 
+      label: 'Note', 
+      render: (val: any) => <span className="text-gray-500 italic text-sm line-clamp-1">{val || 'N/A'}</span>
+    },
+    { 
       key: 'date', 
       label: 'Date & Time',
       render: (val: any) => {

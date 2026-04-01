@@ -57,7 +57,9 @@ const PathologyTestAdd: React.FC<PathologyTestAddProps> = ({ onSubmit, onCancel,
   return (
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(handleFormSubmit)} className="space-y-6">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
+          <FormInput name="date" label="Date & Time" type="datetime-local" required="Date and Time is required" />
+
           <SearchSelect
             name="patientId"
             label="Select Patient"
@@ -79,10 +81,6 @@ const PathologyTestAdd: React.FC<PathologyTestAddProps> = ({ onSubmit, onCancel,
             onAdd={handleAddService}
             onRemove={handleRemoveService}
           />
-        </div>
-
-        <div className="grid grid-cols-1 gap-4">
-          <FormInput name="date" label="Date & Time" type="datetime-local" required="Date and Time is required" />
         </div>
 
         <div className="pt-6 flex justify-end gap-2 border-t border-gray-100 -mx-5 px-5">
