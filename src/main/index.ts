@@ -9,6 +9,7 @@ import { PatientService } from "./services/patient.service";
 import { DoctorService } from "./services/doctor.service";
 import { InvestigationService } from "./services/investigation.service";
 import { PathologyService } from "./services/pathology.service";
+import { InvestigationCategoryService } from "./services/investigationCategory.service";
 import { Doctor } from "./database/entities/Doctor";
 import { Investigation } from "./database/entities/Investigation";
 
@@ -133,6 +134,16 @@ app.whenReady().then(async () => {
           return await ConsultationService.update(payload.id, payload.data);
         case "CONSULTATION:DELETE":
           return await ConsultationService.delete(payload.id);
+
+        // Investigation Category Actions
+        case "INVESTIGATION_CATEGORY:LIST":
+          return await InvestigationCategoryService.getAll();
+        case "INVESTIGATION_CATEGORY:CREATE":
+          return await InvestigationCategoryService.create(payload);
+        case "INVESTIGATION_CATEGORY:UPDATE":
+          return await InvestigationCategoryService.update(payload.id, payload.data);
+        case "INVESTIGATION_CATEGORY:DELETE":
+          return await InvestigationCategoryService.delete(payload.id);
 
         default:
           throw new Error(`Unknown action: ${action}`);

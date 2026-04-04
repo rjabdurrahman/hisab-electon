@@ -8,6 +8,7 @@ import { Investigation } from "./entities/Investigation";
 import { Consultation } from "./entities/Consultation";
 import { PathologyTest } from "./entities/PathologyTest";
 import { PathologyTestInvestigation } from "./entities/PathologyTestInvestigation";
+import { InvestigationCategory } from "./entities/InvestigationCategory";
 
 let dbPath = "database.sqlite";
 if (app) {
@@ -27,6 +28,7 @@ export const AppDataSource = new DataSource({
     Consultation,
     PathologyTest,
     PathologyTestInvestigation,
+    InvestigationCategory,
   ],
   subscribers: [],
   migrations: [],

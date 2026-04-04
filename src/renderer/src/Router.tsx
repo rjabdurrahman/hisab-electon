@@ -6,6 +6,7 @@ import Patient from "./pages/Patient";
 import Investigations from "./pages/Investigations";
 import PathologyTests from "./pages/PathologyTests";
 import Consultations from "./pages/Consultations";
+import InvestigationCategory from "./pages/InvestigationCategory";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
       {
         path: "investigations",
         element: <Investigations />,
+      },
+      {
+        path: "investigation-category",
+        element: <InvestigationCategory />,
       },
     ],
   },
