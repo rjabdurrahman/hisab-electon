@@ -10,6 +10,7 @@ interface PathologyTestFormData {
   patientId: number;
   doctorId?: number;
   services: { id: string | number; label: string; price: number }[];
+  discount: number;
   date: string;
 }
 
@@ -43,12 +44,14 @@ const PathologyTestEdit: React.FC<PathologyTestEditProps> = ({ initialData, onSu
         label: i.name,
         price: i.price
       })) || [],
+      discount: initialData?.discount || 0,
       date: extractDateTime(initialData?.date),
     }
   });
 
   const { control, setValue } = methods;
   const addedServices = useWatch({ control, name: "services" }) || [];
+  const discount = useWatch({ control, name: "discount" }) || 0;
 
   const handleAddService = (service: any) => {
     setValue("services", [...addedServices, service]);
@@ -82,6 +85,8 @@ const PathologyTestEdit: React.FC<PathologyTestEditProps> = ({ initialData, onSu
             placeholder="Select Doctor..."
             options={options.doctors}
           />
+
+          <FormInput name="discount" label="Discount Amount" type="number" />
         </div>
 
         <div className="border-t border-gray-100 pt-4">
@@ -90,6 +95,7 @@ const PathologyTestEdit: React.FC<PathologyTestEditProps> = ({ initialData, onSu
             addedServices={addedServices}
             onAdd={handleAddService}
             onRemove={handleRemoveService}
+            discount={discount}
           />
         </div>
 

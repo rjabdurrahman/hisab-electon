@@ -15,6 +15,7 @@ interface ConsultationData {
   patient: { id: number; name: string; age?: number; gender?: string };
   doctor: { id: number; name: string };
   consultationFee?: number;
+  discount: number;
   notes?: string;
   createdAt: string;
 }
@@ -67,6 +68,7 @@ const Consultations = () => {
         patientId: Number(data.patientId || data.clientId || 0),
         doctorId: Number(data.doctorId || 0),
         consultationFee: Number(data.consultationFee || 0),
+        discount: Number(data.discount || 0),
         notes: data.notes || null
       });
       fetchAllData();
@@ -87,6 +89,7 @@ const Consultations = () => {
           patientId: Number(data.patientId || data.clientId || 0),
           doctorId: Number(data.doctorId || 0),
           consultationFee: Number(data.consultationFee || 0),
+          discount: Number(data.discount || 0),
           notes: data.notes || null
         }
       });
@@ -112,12 +115,57 @@ const Consultations = () => {
 
   const columns: ITableColumn[] = [
     { key: 'id', label: 'ID', headClass: 'w-16' },
-    {
-      key: 'date',
+    { 
+      key: 'date', 
       label: 'Date & Time',
       render: (val: any) => {
         const d = new Date(val);
         return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      }
+    },
+    { 
+      key: 'patient', 
+      label: 'Patient Name', 
+      rowClass: 'font-bold',
+      render: (val) => val?.name || 'N/A'
+    },
+    { 
+      key: 'patient_age', 
+      label: 'Age',
+      render: (_, row) => row.patient?.age || 'N/A'
+    },
+    { 
+      key: 'patient_gender', 
+      label: 'Gender',
+      render: (_, row) => row.patient?.gender || 'N/A'
+    },
+    { 
+      key: 'doctor', 
+      label: 'Doctor',
+      render: (val) => val?.name || 'N/A'
+    },
+    { 
+      key: 'notes', 
+      label: 'Note', 
+      render: (val: any) => <span className="text-gray-500 italic text-sm line-clamp-1">{val || 'N/A'}</span>
+    },
+    { 
+      key: 'consultationFee', 
+      label: 'Fee', 
+      render: (val: any) => <span className="font-bold text-[#2CAFFE]">৳{Number(val || 0).toLocaleString()}</span>
+    },
+    { 
+      key: 'discount', 
+      label: 'Discount', 
+      render: (val: any) => <span className="text-red-500 font-bold">-{Number(val || 0).toLocaleString()}</span>
+    },
+    { 
+      key: 'grandTotal', 
+      label: 'Grand Total', 
+      render: (_, row) => {
+        const fee = Number(row.consultationFee || 0);
+        const disc = Number(row.discount || 0);
+        return <span className="font-black text-emerald-600">৳{(fee - disc).toLocaleString()}</span>
       }
     },
     {

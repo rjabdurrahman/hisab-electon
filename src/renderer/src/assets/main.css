@@ -105,3 +105,26 @@ body {
 ::-webkit-scrollbar-thumb {
   @apply bg-gray-400 rounded-sm;
 }
+
+/* Print Utilities */
+@media print {
+  @page {
+    size: A5;
+    margin: 0;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+
+  /* Force black text and transparent bg for red paper printing */
+  .print-receipt-container {
+    color: #000 !important;
+    background: transparent !important;
+  }
+  
+  /* Fallback Bengali fonts */
+  .font-bengali {
+    font-family: 'SolaimanLipi', 'Siyam Rupali', 'Kalpurush', sans-serif;
+  }
+}

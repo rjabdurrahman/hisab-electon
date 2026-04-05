@@ -27,6 +27,9 @@ export class Consultation {
   @Column("decimal", { precision: 10, scale: 2, name: "consultation_fee", nullable: true })
   consultationFee!: number;
 
+  @Column("decimal", { precision: 10, scale: 2, default: 0, name: "discount" })
+  discount!: number;
+
   @Column("text", { nullable: true })
   notes!: string;
 

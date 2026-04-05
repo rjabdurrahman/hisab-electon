@@ -10,6 +10,7 @@ interface ConsultationFormData {
   doctorId: number
   date: string
   consultationFee: number
+  discount: number
   notes?: string
 }
 
@@ -44,6 +45,7 @@ const ConsultationsEdit: React.FC<ConsultationsEditProps> = ({
       doctorId: initialData?.doctor?.id || initialData?.doctorId,
       date: extractDateTime(initialData?.date),
       consultationFee: initialData?.consultationFee || 0,
+      discount: initialData?.discount || 0,
       notes: initialData?.notes || ''
     }
   })
@@ -73,7 +75,10 @@ const ConsultationsEdit: React.FC<ConsultationsEditProps> = ({
             options={options.doctors}
           />
 
-          <FormInput name="consultationFee" label="Consultation Fee" type="number" required />
+          <div className="grid grid-cols-2 gap-4">
+            <FormInput name="consultationFee" label="Consultation Fee" type="number" required />
+            <FormInput name="discount" label="Discount Amount" type="number" />
+          </div>
 
           <FormInput name="notes" label="Note" placeholder="e.g. Regular checkup" />
         </div>

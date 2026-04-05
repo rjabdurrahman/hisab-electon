@@ -27,23 +27,24 @@ const usePopup = (
     return (
       <div className="fixed inset-0 flex justify-center bg-black/50 z-[100] w-full h-screen overflow-hidden backdrop-blur-[2px] animate-in fade-in duration-200">
         <div
-          className={`relative top-20 ${
+          className={`relative top-10 flex flex-col ${
             variant === "large" ? "w-[600px]" : "w-[400px]"
-          } bg-white rounded shadow-2xl h-fit animate-in slide-in-from-top-10 duration-300 border border-gray-200`}
+          } max-w-[95vw] max-h-[85vh] bg-white rounded shadow-2xl animate-in slide-in-from-top-10 duration-300 border border-gray-200`}
         >
           {/* Header */}
-          <div className="flex justify-between items-center border-b-[1.5px] border-gray-100 p-3 bg-white rounded-t">
-            <h2 className="text-[14px] font-black text-pos-primary font-exo2">{title}</h2>
+          <div className="flex justify-between items-center border-b border-gray-100 p-3 bg-white rounded-t">
+            <h2 className="text-[15px] font-bold text-pos-primary font-exo2">{title}</h2>
             <button
-              className="text-gray-400 hover:text-black hover:bg-gray-100 rounded w-6 h-6 flex items-center justify-center transition-all leading-none pb-1"
+              className="text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full w-8 h-8 flex items-center justify-center transition-all leading-none pb-1.5 text-2xl"
               onClick={closeModal}
+              title="Close"
             >
               &times;
             </button>
           </div>
 
-          {/* Body */}
-          <div className="p-3">
+          {/* Body with scrolling */}
+          <div className="p-4 overflow-y-auto overflow-x-hidden custom-scrollbar flex-1">
             {React.Children.map(children, (child) => {
               if (React.isValidElement<ChildProps>(child)) {
                 return React.cloneElement(child, { handleClose: closeModal });

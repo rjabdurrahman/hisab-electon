@@ -6,11 +6,13 @@ import usePopup from '../hooks/usePopup';
 import Delete from '../components/Delete';
 import TestAdd from '../components/popups/PathologyTestAdd';
 import TestEdit from '../components/popups/PathologyTestEdit';
+import PathologyPrintReceipt from '../components/print/PathologyPrintReceipt';
 
 interface PathologyTestData {
   id: number;
   date: string;
   totalAmount: number;
+  discount: number;
   patient: { id: number; name: string };
   doctor?: { id: number; name: string };
   investigations: { id: number; name: string; price: number }[];
@@ -32,6 +34,28 @@ const PathologyTests = () => {
   const { openModal: openAdd, Modal: AddModal, closeModal: closeAdd } = usePopup("large");
   const { openModal: openEdit, Modal: EditModal, closeModal: closeEdit } = usePopup("large");
   const { openModal: openDelete, Modal: DeleteModal, closeModal: closeDelete } = usePopup("medium");
+  
+  const executePrint = async (testToPrint?: PathologyTestData) => {
+    const test = testToPrint || selectedTest;
+    if (!test) return;
+    
+    try {
+      console.log("Generating PDF...");
+      // Step 1: Generate PDF in background
+      const result: any = await window.api.invoke("APP:GENERATE_PDF", { data: test });
+      
+      if (result && result.success) {
+        // Step 2: Open PDF in dedicated viewer
+        await window.api.invoke("APP:OPEN_PDF_VIEWER", { 
+          filePath: result.filePath, 
+          title: `Receipt - ${test.patient?.name || "Patient"}` 
+        });
+      }
+    } catch (e) {
+      console.error("Print flow failed:", e);
+      alert("Failed to generate print preview.");
+    }
+  };
 
   const fetchAllData = async () => {
     setLoading(true);
@@ -66,6 +90,7 @@ const PathologyTests = () => {
         date: data.date,
         patientId: Number(data.patientId || 0),
         doctorId: data.doctorId ? Number(data.doctorId) : undefined,
+        discount: Number(data.discount || 0),
         testIds: data.services?.map((s: any) => Number(s.id || 0)) || []
       });
       fetchAllData();
@@ -82,6 +107,7 @@ const PathologyTests = () => {
         date: data.date,
         patientId: Number(data.patientId || 0),
         doctorId: data.doctorId ? Number(data.doctorId) : undefined,
+        discount: Number(data.discount || 0),
         testIds: data.services?.map((s: any) => Number(s.id || 0)) || []
       });
       fetchAllData();
@@ -138,14 +164,36 @@ const PathologyTests = () => {
         </div>
       )
     },
-    {
-       key: 'totalAmount',
-       label: 'Total',
-       render: (val: any) => <span className="font-black text-[#2CAFFE] font-mono text-sm">৳{Number(val).toLocaleString()}</span>
-    },
+     {
+        key: 'totalAmount',
+        label: 'Sub Total',
+        render: (val: any) => <span className="font-bold text-gray-600 font-mono text-sm">৳{Number(val).toLocaleString()}</span>
+     },
+     {
+        key: 'discount',
+        label: 'Discount',
+        render: (val: any) => <span className="font-bold text-red-500 font-mono text-sm">-{Number(val || 0).toLocaleString()}</span>
+     },
+     {
+        key: 'grandTotal',
+        label: 'Grand Total',
+        render: (_, row) => {
+          const total = Number(row.totalAmount || 0);
+          const disc = Number(row.discount || 0);
+          return <span className="font-black text-emerald-600 font-mono text-sm">৳{(total - disc).toLocaleString()}</span>
+        }
+     },
     {
       key: 'actions', label: 'Actions', headClass: 'text-right', rowClass: 'text-right', render: (_, row) => (
         <div className="flex justify-end gap-1">
+          <Button
+            variant="icon"
+            size="extraSmall"
+            onClick={() => { executePrint(row); }}
+            textColor="#2563EB"
+          >
+            🖨️
+          </Button>
           <Button
             variant="icon"
             size="extraSmall"
@@ -209,6 +257,12 @@ const PathologyTests = () => {
       <DeleteModal title="Delete">
         <Delete handleDelete={handleDelete} />
       </DeleteModal>
+
+
+      {/* Render the section off-screen so the system print dialog can 'snapshot' it for the preview */}
+      <div id="print-section" style={{ position: 'fixed', left: '-9999px', top: '0', width: '148mm', zIndex: -1 }}>
+         {selectedTest && <PathologyPrintReceipt data={selectedTest} />}
+      </div>
     </div>
   );
 };
