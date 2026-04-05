@@ -7,6 +7,7 @@ import Investigations from "./pages/Investigations";
 import PathologyTests from "./pages/PathologyTests";
 import Consultations from "./pages/Consultations";
 import PathologyPrintPage from "./pages/PathologyPrintPage";
+import InvestigationCategory from "./pages/InvestigationCategory";
 
 const router = createHashRouter([
   {
@@ -40,6 +41,10 @@ const router = createHashRouter([
       {
         path: "investigations",
         element: <Investigations />,
+      },
+      {
+        path: "investigation-category",
+        element: <InvestigationCategory />,
       },
     ],
   },

@@ -13,6 +13,7 @@ const Sidebar: React.FC = () => {
     { id: 'doctor', label: 'DOCTOR', icon: '👨‍⚕️' },
     { id: 'patient', label: 'PATIENT', icon: '👥' },
     { id: 'investigations', label: 'INVESTIGATIONS', icon: '💼' },
+    { id: 'investigation-category', label: 'INV. CATEGORY', icon: '📂' },
   ];
 
   return (
