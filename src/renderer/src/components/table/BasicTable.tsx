@@ -39,7 +39,7 @@ const BasicTable: React.FC<TableProps> = ({
       <th
         key={column.label + column.key}
         className={clsx(
-          "text-left px-3 py-3 font-bold text-white border-b border-divider bg-[#333333] sticky top-0 z-1 text-[13px]",
+          "text-left px-3 py-3 font-bold text-white border-b border-divider bg-[#333333] sticky top-0 z-1 text-[16px]",
           column.headClass
         )}
       >
@@ -59,7 +59,7 @@ const BasicTable: React.FC<TableProps> = ({
         return (
           <td key={column.label + column.key}
             className={clsx(
-              "p-3 text-[#333333] border-b border-[#D1D5DB] text-[12px] font-medium transition-all group-hover:border-[#2563EB]/20",
+              "p-3 text-[#333333] border-b border-[#D1D5DB] text-[16px] font-medium transition-all group-hover:border-[#2563EB]/20",
               column.rowClass
             )}>
             {column.key === "sl"
@@ -78,7 +78,7 @@ const BasicTable: React.FC<TableProps> = ({
       {miniColumns?.map((column) => (
         <td key={column.label + column.key} className={clsx("block py-1", column.rowClass)}>
           <span className="font-bold text-[9px]  tracking-tighter text-gray-400 mr-2">{column.label}:</span>
-          <span className="text-[12px] font-medium text-[#333333]">
+          <span className="text-[16px] font-medium text-[#333333]">
             {column.key === "sl"
               ? idx + 1
               : column.render

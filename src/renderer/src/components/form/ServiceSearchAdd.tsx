@@ -105,19 +105,19 @@ const ServiceSearchAdd: React.FC<ServiceSearchAddProps> = ({
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
-              <th className="px-3 py-2 text-left text-xs font-bold text-gray-600 w-12 text-center">SL</th>
-              <th className="px-3 py-2 text-left text-xs font-bold text-gray-600">Test Name</th>
-              <th className="px-3 py-2 text-right text-xs font-bold text-gray-600 w-24">Price</th>
-              <th className="px-3 py-2 text-center text-xs font-bold text-gray-600 w-12">Action</th>
+              <th className="px-3 py-2 text-[16px] font-bold text-gray-600 w-12 text-center">SL</th>
+              <th className="px-3 py-2 text-left text-[16px] font-bold text-gray-600">Test Name</th>
+              <th className="px-3 py-2 text-right text-[16px] font-bold text-gray-600 w-24">Price</th>
+              <th className="px-3 py-2 text-center text-[16px] font-bold text-gray-600 w-12">Action</th>
             </tr>
           </thead>
           <tbody>
             {addedServices.length > 0 ? (
               addedServices.map((service, idx) => (
                 <tr key={service.id} className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50 transition-colors">
-                  <td className="px-3 py-2.5 text-xs text-gray-400 font-mono text-center">{(idx + 1).toString().padStart(2, '0')}</td>
-                  <td className="px-3 py-2.5 text-sm font-semibold text-[#333333]">{service.label}</td>
-                  <td className="px-3 py-2.5 text-sm font-bold text-[#333333] text-right font-mono">৳{service.price.toLocaleString()}</td>
+                  <td className="px-3 py-2.5 text-[16px] text-gray-400 font-mono text-center">{(idx + 1).toString().padStart(2, '0')}</td>
+                  <td className="px-3 py-2.5 text-[16px] font-semibold text-pos-primary">{service.label}</td>
+                  <td className="px-3 py-2.5 text-[16px] font-bold text-[#333333] text-right font-mono">৳{service.price.toLocaleString()}</td>
                   <td className="px-3 py-2.5 text-center">
                     <button 
                       type="button"
@@ -141,27 +141,27 @@ const ServiceSearchAdd: React.FC<ServiceSearchAddProps> = ({
           {addedServices.length > 0 && (
             <tfoot className="bg-gray-50/50">
               <tr>
-                <td colSpan={2} className="px-3 py-1.5 text-right text-xs font-bold text-gray-500">
+                <td colSpan={2} className="px-3 py-1.5 text-right text-[16px] font-bold text-gray-500">
                    Sub Total:
                 </td>
-                <td className="px-3 py-1.5 text-right text-sm font-bold text-[#333333] font-mono border-l border-gray-100">
+                <td className="px-3 py-1.5 text-right text-[16px] font-bold text-pos-primary font-mono border-l border-gray-100">
                    ৳{totalPrice.toLocaleString()}
                 </td>
                 <td></td>
               </tr>
               {discount > 0 && (
                 <tr className="border-t border-gray-100">
-                  <td colSpan={2} className="px-3 py-1.5 text-right text-xs font-bold text-[#ef4444]">
+                  <td colSpan={2} className="px-3 py-1.5 text-right text-[16px] font-bold text-[#ef4444]">
                     Discount:
                   </td>
-                  <td className="px-3 py-1.5 text-right text-sm font-bold text-[#ef4444] font-mono border-l border-gray-100">
+                  <td className="px-3 py-1.5 text-right text-[16px] font-bold text-[#ef4444] font-mono border-l border-gray-100">
                     -৳{Number(discount).toLocaleString()}
                   </td>
                   <td></td>
                 </tr>
               )}
               <tr className="bg-emerald-50/50 border-t border-gray-200">
-                <td colSpan={2} className="px-3 py-3 text-right text-xs font-bold text-[#333333]">
+                <td colSpan={2} className="px-3 py-3 text-right text-[16px] font-bold text-pos-primary">
                    Net Payable:
                 </td>
                 <td className="px-3 py-3 text-right text-xl font-black text-emerald-600 font-mono border-l border-emerald-100">

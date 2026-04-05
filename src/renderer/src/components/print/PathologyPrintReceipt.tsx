@@ -91,7 +91,7 @@ const PathologyPrintReceipt: React.FC<PathologyPrintReceiptProps> = ({ data }) =
       </div>
 
       {/* Investigation Table */}
-      <table className="w-full border border-black border-t-0 text-[13px]">
+      <table className="w-full border border-black border-t-0 text-[16px]">
         <thead>
           <tr className="border-b border-black">
             <th className="py-1 px-1 border-r border-black font-normal w-[10%] text-center">SL No</th>
